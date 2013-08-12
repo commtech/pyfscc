@@ -1,20 +1,20 @@
 """
-        Copyright (C) 2012 Commtech, Inc.
+    Copyright (C) 2013 Commtech, Inc.
 
-        This file is part of fscc-linux.
+    This file is part of pyfscc.
 
-        fscc-linux is free software: you can redistribute it and/or modify
-        it under the terms of the GNU General Public License as published by
-        the Free Software Foundation, either version 3 of the License, or
-        (at your option) any later version.
+    pyfscc is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-        fscc-linux is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        GNU General Public License for more details.
+    pyfscc is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with fscc-linux.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License
+    along with pyfscc.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 
@@ -23,45 +23,101 @@ import select
 import errno
 import io
 import os
-import win32file
 
-def CTL_CODE(DeviceType, Function, Method, Access):
-    return (DeviceType<<16) | (Access << 14) | (Function << 2) | Method
-
-FSCC_IOCTL_MAGIC = 0x8018
-METHOD_BUFFERED = 0
-FILE_ANY_ACCESS = 0
+if os.name == 'nt':
+    import win32file
+else:
+    import fcntl
 
 
-FSCC_GET_REGISTERS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS)
-FSCC_SET_REGISTERS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS)
+if os.name == 'nt':
+    METHOD_BUFFERED = 0
+    FILE_ANY_ACCESS = 0
 
-FSCC_PURGE_TX = CTL_CODE(FSCC_IOCTL_MAGIC, 0x802, METHOD_BUFFERED, FILE_ANY_ACCESS)
-FSCC_PURGE_RX = CTL_CODE(FSCC_IOCTL_MAGIC, 0x803, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    def CTL_CODE(DeviceType, Function, Method=METHOD_BUFFERED,
+                 Access=FILE_ANY_ACCESS):
+        return (DeviceType << 16) | (Access << 14) | (Function << 2) | Method
 
-FSCC_ENABLE_APPEND_STATUS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x804, METHOD_BUFFERED, FILE_ANY_ACCESS)
-FSCC_DISABLE_APPEND_STATUS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x805, METHOD_BUFFERED, FILE_ANY_ACCESS)
-FSCC_GET_APPEND_STATUS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80D, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    FSCC_IOCTL_MAGIC = 0x8018
 
-FSCC_SET_MEMORY_CAP = CTL_CODE(FSCC_IOCTL_MAGIC, 0x806, METHOD_BUFFERED, FILE_ANY_ACCESS)
-FSCC_GET_MEMORY_CAP = CTL_CODE(FSCC_IOCTL_MAGIC, 0x807, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    FSCC_GET_REGISTERS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x800)
+    FSCC_SET_REGISTERS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x801)
 
-FSCC_SET_CLOCK_BITS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x808, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    FSCC_PURGE_TX = CTL_CODE(FSCC_IOCTL_MAGIC, 0x802)
+    FSCC_PURGE_RX = CTL_CODE(FSCC_IOCTL_MAGIC, 0x803)
 
-FSCC_ENABLE_IGNORE_TIMEOUT = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80A, METHOD_BUFFERED, FILE_ANY_ACCESS)
-FSCC_DISABLE_IGNORE_TIMEOUT = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80B, METHOD_BUFFERED, FILE_ANY_ACCESS)
-FSCC_GET_IGNORE_TIMEOUT = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80F, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    FSCC_ENABLE_APPEND_STATUS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x804)
+    FSCC_DISABLE_APPEND_STATUS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x805)
+    FSCC_GET_APPEND_STATUS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80D)
 
-FSCC_SET_TX_MODIFIERS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80C, METHOD_BUFFERED, FILE_ANY_ACCESS)
-FSCC_GET_TX_MODIFIERS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80E, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    FSCC_SET_MEMORY_CAP = CTL_CODE(FSCC_IOCTL_MAGIC, 0x806)
+    FSCC_GET_MEMORY_CAP = CTL_CODE(FSCC_IOCTL_MAGIC, 0x807)
 
-FSCC_ENABLE_RX_MULTIPLE = CTL_CODE(FSCC_IOCTL_MAGIC, 0x810, METHOD_BUFFERED, FILE_ANY_ACCESS)
-FSCC_DISABLE_RX_MULTIPLE = CTL_CODE(FSCC_IOCTL_MAGIC, 0x811, METHOD_BUFFERED, FILE_ANY_ACCESS)
-FSCC_GET_RX_MULTIPLE = CTL_CODE(FSCC_IOCTL_MAGIC, 0x812, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    FSCC_SET_CLOCK_BITS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x808)
+
+    FSCC_ENABLE_IGNORE_TIMEOUT = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80A)
+    FSCC_DISABLE_IGNORE_TIMEOUT = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80B)
+    FSCC_GET_IGNORE_TIMEOUT = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80F)
+
+    FSCC_SET_TX_MODIFIERS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80C)
+    FSCC_GET_TX_MODIFIERS = CTL_CODE(FSCC_IOCTL_MAGIC, 0x80E)
+
+    FSCC_ENABLE_RX_MULTIPLE = CTL_CODE(FSCC_IOCTL_MAGIC, 0x810)
+    FSCC_DISABLE_RX_MULTIPLE = CTL_CODE(FSCC_IOCTL_MAGIC, 0x811)
+    FSCC_GET_RX_MULTIPLE = CTL_CODE(FSCC_IOCTL_MAGIC, 0x812)
+else:
+    IOCPARM_MASK = 0x7f
+    IO_NONE = 0x00000000
+    IO_WRITE = 0x40000000
+    IO_READ = 0x80000000
+
+    def FIX(x):
+        return struct.unpack("i", struct.pack("I", x))[0]
+
+    def _IO(x, y):
+        return FIX(IO_NONE | (x << 8) | y)
+
+    def _IOR(x, y, t):
+        return FIX(IO_READ | ((t & IOCPARM_MASK) << 16) | (x << 8) | y)
+
+    def _IOW(x, y, t):
+        return FIX(IO_WRITE | ((t & IOCPARM_MASK) << 16) | (x << 8) | y)
+
+    def _IOWR(x, y, t):
+        return FIX(IO_READ | IO_WRITE | ((t & IOCPARM_MASK) << 16) |
+               (x << 8) | y)
+
+    FSCC_IOCTL_MAGIC = 0x18
+
+    FSCC_GET_REGISTERS = _IOR(FSCC_IOCTL_MAGIC, 0, struct.calcsize("P"))
+    FSCC_SET_REGISTERS = _IOW(FSCC_IOCTL_MAGIC, 1, struct.calcsize("P"))
+
+    FSCC_PURGE_TX = _IO(FSCC_IOCTL_MAGIC, 2)
+    FSCC_PURGE_RX = _IO(FSCC_IOCTL_MAGIC, 3)
+
+    FSCC_ENABLE_APPEND_STATUS = _IO(FSCC_IOCTL_MAGIC, 4)
+    FSCC_DISABLE_APPEND_STATUS = _IO(FSCC_IOCTL_MAGIC, 5)
+    FSCC_GET_APPEND_STATUS = _IOR(FSCC_IOCTL_MAGIC, 13, struct.calcsize("P"))
+
+    FSCC_SET_MEMORY_CAP = _IOW(FSCC_IOCTL_MAGIC, 6, struct.calcsize("P"))
+    FSCC_GET_MEMORY_CAP = _IOR(FSCC_IOCTL_MAGIC, 7, struct.calcsize("P"))
+
+    FSCC_ENABLE_IGNORE_TIMEOUT = _IO(FSCC_IOCTL_MAGIC, 10)
+    FSCC_DISABLE_IGNORE_TIMEOUT = _IO(FSCC_IOCTL_MAGIC, 11)
+    FSCC_GET_IGNORE_TIMEOUT = _IOR(FSCC_IOCTL_MAGIC, 15, struct.calcsize("P"))
+
+    FSCC_SET_TX_MODIFIERS = _IOW(FSCC_IOCTL_MAGIC, 12, struct.calcsize("i"))
+    FSCC_GET_TX_MODIFIERS = _IOR(FSCC_IOCTL_MAGIC, 14, struct.calcsize("P"))
+
+    FSCC_ENABLE_RX_MULTIPLE = _IO(FSCC_IOCTL_MAGIC, 16)
+    FSCC_DISABLE_RX_MULTIPLE = _IO(FSCC_IOCTL_MAGIC, 17)
+    FSCC_GET_RX_MULTIPLE = _IOR(FSCC_IOCTL_MAGIC, 18, struct.calcsize("P"))
 
 FSCC_UPDATE_VALUE = -2
 
 XF, XREP, TXT, TXEXT = 0, 1, 2, 4
+
+NOT_SUPPORTED_TEXT = 'This feature isn\'t supported on this port.'
 
 
 class InvalidPortError(Exception):
@@ -164,10 +220,9 @@ class Port(io.FileIO):
 
             registers = list(self)
 
-            buf_size = struct.calcsize("q" * len(registers))
-            buf = win32file.DeviceIoControl(self.port.hComPort, FSCC_GET_REGISTERS, 
-                             struct.pack("q" * len(registers), *registers), buf_size, None)
-            regs = struct.unpack("q" * len(registers), buf)
+            fmt = "q" * len(registers)
+            regs = self.port._ioctl_get_struct(FSCC_GET_REGISTERS, fmt,
+                                               registers)
 
             for i, register in enumerate(registers):
                 if register != -1:
@@ -180,9 +235,9 @@ class Port(io.FileIO):
 
             registers = list(self)
 
-            buf_size = struct.calcsize("q" * len(registers))
-            win32file.DeviceIoControl(self.port.hComPort, FSCC_SET_REGISTERS, 
-                             struct.pack("q" * len(registers), *registers), buf_size, None)
+            fmt = "q" * len(registers)
+            value = struct.pack(fmt, *registers)
+            self.port._ioctl_set_struct(FSCC_SET_REGISTERS, fmt, value)
 
         def _set_register_by_index(self, index, value):
             """Sets the value of a register by it's index."""
@@ -236,74 +291,209 @@ class Port(io.FileIO):
                     export_file.write("%s = 0x%08x\n" % (register_name, value))
 
     def __init__(self, port_name, mode, append_status=False):
-        file_name = '\\\\.\\' + port_name
 
-        #if not os.path.exists(file_name):
-        #    raise IOError(errno.ENOENT, os.strerror(errno.ENOENT), file_name)
+        if os.name == 'nt':
+            file_name = '\\\\.\\' + port_name
 
-        self.hComPort = win32file.CreateFile(file_name,
-               win32file.GENERIC_READ | win32file.GENERIC_WRITE,
-               0, # exclusive access
-               None, # no security
-               win32file.OPEN_EXISTING,
-               win32file.FILE_ATTRIBUTE_NORMAL | win32file.FILE_FLAG_OVERLAPPED,
-               0)
+            self.hComPort = win32file.CreateFile(file_name,
+                win32file.GENERIC_READ | win32file.GENERIC_WRITE,
+                0,  # exclusive access
+                None,  # no security
+                win32file.OPEN_EXISTING,
+                win32file.FILE_ATTRIBUTE_NORMAL |
+                    win32file.FILE_FLAG_OVERLAPPED,
+                0)
+        else:
+            file_name = port_name
 
         io.FileIO.__init__(self, file_name, mode)
 
         self.registers = Port.Registers(self)
 
         try:
-        	self.append_status = append_status
-        except IOError as e:
+            self.append_status = append_status
+        except IOError:
             raise InvalidPortError(file_name)
+
+    def _ioctl_action(self, ioctl_name):
+        if os.name == 'nt':
+            try:
+                win32file.DeviceIoControl(self.hComPort, ioctl_name, None, 0,
+                                          None)
+            except win32file.error as e:
+                if e.winerror == 50:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                else:
+                    raise
+        else:
+            try:
+                fcntl.ioctl(self, ioctl_name)
+            except IOError as e:
+                if e.errno == errno.EPROTONOSUPPORT:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                else:
+                    raise
+
+    def _ioctl_set_boolean(self, ioctl_enable, ioctl_disable, value):
+        ioctl_name = ioctl_enable if value else ioctl_disable
+        self._ioctl_action(ioctl_name)
+
+    def _ioctl_get_boolean(self, ioctl_name):
+        if os.name == 'nt':
+            buf_size = struct.calcsize('?')
+            try:
+                buf = win32file.DeviceIoControl(self.hComPort, ioctl_name,
+                                                None, buf_size, None)
+            except win32file.error as e:
+                if e.winerror == 50:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                else:
+                    raise
+        else:
+            try:
+                buf = fcntl.ioctl(self, ioctl_name, struct.pack('?', 0))
+            except IOError as e:
+                if e.errno == errno.EPROTONOSUPPORT:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                else:
+                    raise
+
+        value = struct.unpack('?', buf)
+
+        return True if value[0] else False
+
+    def _ioctl_set_integer(self, ioctl_name, value, fmt='i'):
+        if os.name == 'nt':
+            try:
+                value = struct.pack(fmt, value)
+                win32file.DeviceIoControl(self.hComPort, ioctl_name, value, 0,
+                                          None)
+            except win32file.error as e:
+                if e.winerror == 50:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                elif e.winerror == 87:
+                    raise ValueError('The argument is out of range.')
+                else:
+                    raise
+        else:
+            try:
+                fcntl.ioctl(self, ioctl_name, value)
+            except IOError as e:
+                if e.errno == errno.EPROTONOSUPPORT:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                elif e.errno == errno.EINVAL:
+                    raise ValueError('The argument is out of range.')
+                else:
+                    raise
+
+    def _ioctl_set_uinteger(self, ioctl_name, value):
+        self._ioctl_set_integer(ioctl_name, value, 'I')
+
+    def _ioctl_get_integer(self, ioctl_name, fmt='i'):
+        if os.name == 'nt':
+            buf_size = struct.calcsize(fmt)
+            try:
+                buf = win32file.DeviceIoControl(self.hComPort, ioctl_name,
+                                                None, buf_size, None)
+            except win32file.error as e:
+                if e.winerror == 50:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                else:
+                    raise
+        else:
+            try:
+                buf = fcntl.ioctl(self, ioctl_name, struct.pack(fmt, 0))
+            except IOError as e:
+                if e.errno == errno.EPROTONOSUPPORT:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                else:
+                    raise
+
+        value = struct.unpack(fmt, buf)
+        return value[0]
+
+    def _ioctl_get_uinteger(self, ioctl_name):
+        return self._ioctl_get_integer(ioctl_name, 'I')
+
+    def _ioctl_set_struct(self, ioctl_name, fmt, value):
+        if os.name == 'nt':
+            buf_size = struct.pack(fmt, value)
+            try:
+                win32file.DeviceIoControl(self.hComPort, ioctl_name, value,
+                                          buf_size, None)
+            except win32file.error as e:
+                if e.winerror == 50:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                elif e.winerror == 87:
+                    raise ValueError('The argument is out of range.')
+                else:
+                    raise
+        else:
+            try:
+                fcntl.ioctl(self, ioctl_name, value)
+            except IOError as e:
+                if e.errno == errno.EPROTONOSUPPORT:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                elif e.errno == errno.EINVAL:
+                    raise ValueError('The argument is out of range.')
+                else:
+                    raise
+
+    def _ioctl_get_struct(self, ioctl_name, fmt, initial):
+        if os.name == 'nt':
+            buf_size = struct.calcsize(fmt)
+            try:
+                buf = win32file.DeviceIoControl(self.hComPort, ioctl_name,
+                                                struct.pack(fmt, *initial),
+                                                buf_size, None)
+            except win32file.error as e:
+                if e.winerror == 50:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                else:
+                    raise
+        else:
+            try:
+                buf = fcntl.ioctl(self, ioctl_name, struct.pack(fmt, *initial))
+            except IOError as e:
+                if e.errno == errno.EPROTONOSUPPORT:
+                    raise AttributeError(NOT_SUPPORTED_TEXT)
+                else:
+                    raise
+
+        value = struct.unpack(fmt, buf)
+
+        return value
 
     def purge(self, tx=True, rx=True):
         """Removes unsent and/or unread data from the card."""
         if (tx):
-            try:
-                win32file.DeviceIoControl(self.hComPort, FSCC_PURGE_TX, None, 0, None)
-            except IOError as e:
-                raise e
+            self._ioctl_action(FSCC_PURGE_TX)
+
         if (rx):
-            try:
-                win32file.DeviceIoControl(self.hComPort, FSCC_PURGE_RX, None, 0, None)
-            except IOError as e:
-                raise e
+            self._ioctl_action(FSCC_PURGE_RX)
 
     def _set_append_status(self, append_status):
         """Sets the value of the append status setting."""
-        if append_status:
-            win32file.DeviceIoControl(self.hComPort, FSCC_ENABLE_APPEND_STATUS, None, 0, None)
-        else:
-            win32file.DeviceIoControl(self.hComPort, FSCC_DISABLE_APPEND_STATUS, None, 0, None)
+        self._ioctl_set_boolean(FSCC_ENABLE_APPEND_STATUS,
+                                FSCC_DISABLE_APPEND_STATUS,
+                                append_status)
 
     def _get_append_status(self):
         """Gets the value of the append status setting."""
-        buf_size = struct.calcsize("?")
-        buf = win32file.DeviceIoControl(self.hComPort, FSCC_GET_APPEND_STATUS, None, buf_size, None)
-        value = struct.unpack("?", buf)
-
-        if (value[0]):
-            return True
-        else:
-            return False
+        return self._ioctl_get_boolean(FSCC_GET_APPEND_STATUS)
 
     append_status = property(fset=_set_append_status, fget=_get_append_status)
 
     def _set_memcap(self, input_memcap, output_memcap):
         """Sets the value of the memory cap setting."""
-        buf_size = struct.calcsize("i" * 2)
-        win32file.DeviceIoControl(self.hComPort, FSCC_SET_MEMORY_CAP, 
-                   struct.pack("i" * 2, input_memcap, output_memcap), buf_size, None)
+        fmt = 'i' * 2
+        value = struct.pack(fmt, input_memcap, output_memcap)
+        self._ioctl_set_struct(FSCC_SET_MEMORY_CAP, fmt, value)
 
     def _get_memcap(self):
         """Gets the value of the memory cap setting."""
-        buf_size = struct.calcsize("i" * 2)
-        buf = win32file.DeviceIoControl(self.hComPort, FSCC_GET_MEMORY_CAP, 
-                         struct.pack("i" * 2, -1, -1), buf_size, None)
-
-        return struct.unpack("i" * 2, buf)
+        fmt = 'i' * 2
+        return self._ioctl_get_struct(FSCC_GET_MEMORY_CAP, fmt, (-1, -1))
 
     def _set_imemcap(self, memcap):
         """Sets the value of the input memory cap setting."""
@@ -327,54 +517,38 @@ class Port(io.FileIO):
 
     def _set_ignore_timeout(self, ignore_timeout):
         """Sets the value of the ignore timeout setting."""
-        if ignore_timeout:
-            win32file.DeviceIoControl(self.hComPort, FSCC_ENABLE_IGNORE_TIMEOUT, None, 0, None)
-        else:
-            win32file.DeviceIoControl(self.hComPort, FSCC_DISABLE_IGNORE_TIMEOUT, None, 0, None)
+        self._ioctl_set_boolean(FSCC_ENABLE_IGNORE_TIMEOUT,
+                                FSCC_DISABLE_IGNORE_TIMEOUT,
+                                ignore_timeout)
 
     def _get_ignore_timeout(self):
         """Gets the value of the ignore timeout setting."""
-        buf_size = struct.calcsize("?")
-        buf = win32file.DeviceIoControl(self.hComPort, FSCC_GET_IGNORE_TIMEOUT, None, buf_size, None)
-        value = struct.unpack("?", buf)
-
-        return value[0]
+        return self._ioctl_get_boolean(FSCC_GET_APPEND_STATUS)
 
     ignore_timeout = property(fset=_set_ignore_timeout,
                               fget=_get_ignore_timeout)
 
     def _set_tx_modifiers(self, tx_modifiers):
         """Sets the value of the transmit modifiers setting."""
-        value = struct.pack("I", tx_modifiers)
-        win32file.DeviceIoControl(self.hComPort, FSCC_SET_TX_MODIFIERS, value, 0, None)
+        self._ioctl_set_uinteger(FSCC_SET_TX_MODIFIERS, tx_modifiers)
 
     def _get_tx_modifiers(self):
         """Gets the value of the transmit modifiers setting."""
-        buf_size = struct.calcsize("I")
-        buf = win32file.DeviceIoControl(self.hComPort, FSCC_GET_TX_MODIFIERS, None, buf_size, None)
-        value = struct.unpack("I", buf)
-
-        return value[0]
+        return self._ioctl_get_uinteger(FSCC_GET_TX_MODIFIERS)
 
     tx_modifiers = property(fset=_set_tx_modifiers, fget=_get_tx_modifiers)
 
     def _set_rx_multiple(self, rx_multiple):
         """Sets the value of the ignore timeout setting."""
-        if rx_multiple:
-            win32file.DeviceIoControl(self.hComPort, FSCC_ENABLE_RX_MULTIPLE, None, 0, None)
-        else:
-            win32file.DeviceIoControl(self.hComPort, FSCC_DISABLE_RX_MULTIPLE, None, 0, None)
+        self._ioctl_set_boolean(FSCC_ENABLE_RX_MULTIPLE,
+                                FSCC_DISABLE_RX_MULTIPLE,
+                                rx_multiple)
 
     def _get_rx_multiple(self):
         """Gets the value of the ignore timeout setting."""
-        buf_size = struct.calcsize("?")
-        buf = win32file.DeviceIoControl(self.hComPort, FSCC_GET_RX_MULTIPLE, None, buf_size, None)
-        value = struct.unpack("?", buf)
+        return self._ioctl_get_boolean(FSCC_GET_RX_MULTIPLE)
 
-        return value[0]
-
-    rx_multiple = property(fset=_set_rx_multiple,
-                              fget=_get_rx_multiple)
+    rx_multiple = property(fset=_set_rx_multiple, fget=_get_rx_multiple)
 
     def read(self, max_bytes=4096):
         """Reads data from the card."""
@@ -410,13 +584,17 @@ class Port(io.FileIO):
             return False
 
 if __name__ == '__main__':
-    p = Port('FSCC0', 'rb')
+    if os.name == 'nt':
+        p = Port('FSCC0', 'rb')
+    else:
+        p = Port('/dev/fscc0', 'rb')
 
     print("Append Status", p.append_status)
     print("Input Memory Cap", p.input_memory_cap)
     print("Output Memory Cap", p.output_memory_cap)
     print("Ignore Timeout", p.ignore_timeout)
     print("Transmit Modifiers", p.tx_modifiers)
+    print("RX Multiple", p.rx_multiple)
 
     print("CCR0", hex(p.registers.CCR0))
     print("CCR1", hex(p.registers.CCR1))
@@ -428,3 +606,8 @@ if __name__ == '__main__':
     p.output_memory_cap = 1000000
     p.ignore_timeout = False
     p.tx_modifiers = 0
+    p.rx_modifiers = False
+
+    p.purge()
+
+    p.close()
