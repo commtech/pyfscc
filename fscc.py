@@ -417,7 +417,7 @@ class Port(io.FileIO):
 
     def _ioctl_set_struct(self, ioctl_name, fmt, value):
         if os.name == 'nt':
-            buf_size = struct.pack(fmt, value)
+            buf_size = struct.calcsize(fmt)
             try:
                 win32file.DeviceIoControl(self.hComPort, ioctl_name, value,
                                           buf_size, None)
