@@ -298,7 +298,7 @@ class Port(io.FileIO):
                 if value >= 0:
                     export_file.write("%s = 0x%08x\n" % (register_name, value))
 
-    def __init__(self, port_name, mode, append_status=False):
+    def __init__(self, port_name, mode, append_status=True, append_timestamp=True):
 
         if os.name == 'nt':
             file_name = '\\\\.\\' + port_name
@@ -322,6 +322,8 @@ class Port(io.FileIO):
             self.append_status = append_status
         except IOError:
             raise InvalidPortError(file_name)
+
+        self.append_timestamp = append_timestamp
 
     def _ioctl_action(self, ioctl_name):
         if os.name == 'nt':
@@ -622,7 +624,8 @@ if __name__ == '__main__':
     print("CCR2", hex(p.registers.CCR2))
     print("BGR", hex(p.registers.BGR))
 
-    p.append_status = False
+    p.append_status = True
+    p.append_timestamp = True
     p.input_memory_cap = 1000000
     p.output_memory_cap = 1000000
     p.ignore_timeout = False
