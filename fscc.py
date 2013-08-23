@@ -65,6 +65,10 @@ if os.name == 'nt':
     FSCC_ENABLE_RX_MULTIPLE = CTL_CODE(FSCC_IOCTL_MAGIC, 0x810)
     FSCC_DISABLE_RX_MULTIPLE = CTL_CODE(FSCC_IOCTL_MAGIC, 0x811)
     FSCC_GET_RX_MULTIPLE = CTL_CODE(FSCC_IOCTL_MAGIC, 0x812)
+
+    FSCC_ENABLE_APPEND_TIMESTAMP = CTL_CODE(FSCC_IOCTL_MAGIC, 0x813)
+    FSCC_DISABLE_APPEND_TIMESTAMP = CTL_CODE(FSCC_IOCTL_MAGIC, 0x814)
+    FSCC_GET_APPEND_TIMESTAMP = CTL_CODE(FSCC_IOCTL_MAGIC, 0x815)
 else:
     IOCPARM_MASK = 0x7f
     IO_NONE = 0x00000000
@@ -112,6 +116,10 @@ else:
     FSCC_ENABLE_RX_MULTIPLE = _IO(FSCC_IOCTL_MAGIC, 16)
     FSCC_DISABLE_RX_MULTIPLE = _IO(FSCC_IOCTL_MAGIC, 17)
     FSCC_GET_RX_MULTIPLE = _IOR(FSCC_IOCTL_MAGIC, 18, struct.calcsize("P"))
+
+    FSCC_ENABLE_APPEND_TIMESTAMP = _IO(FSCC_IOCTL_MAGIC, 19)
+    FSCC_DISABLE_APPEND_TIMESTAMP = _IO(FSCC_IOCTL_MAGIC, 20)
+    FSCC_GET_APPEND_TIMESTAMP = _IOR(FSCC_IOCTL_MAGIC, 21, struct.calcsize("P"))
 
 FSCC_UPDATE_VALUE = -2
 
@@ -484,6 +492,18 @@ class Port(io.FileIO):
 
     append_status = property(fset=_set_append_status, fget=_get_append_status)
 
+    def _set_append_timestamp(self, append_timestamp):
+        """Sets the value of the append timestamp setting."""
+        self._ioctl_set_boolean(FSCC_ENABLE_APPEND_TIMESTAMP,
+                                FSCC_DISABLE_APPEND_TIMESTAMP,
+                                append_timestamp)
+
+    def _get_append_timestamp(self):
+        """Gets the value of the append timestamp setting."""
+        return self._ioctl_get_boolean(FSCC_GET_APPEND_TIMESTAMP)
+
+    append_timestamp = property(fset=_set_append_timestamp, fget=_get_append_timestamp)
+
     def _set_memcap(self, input_memcap, output_memcap):
         """Sets the value of the memory cap setting."""
         fmt = 'i' * 2
@@ -590,6 +610,7 @@ if __name__ == '__main__':
         p = Port('/dev/fscc0', 'rb')
 
     print("Append Status", p.append_status)
+    print("Append Timestamp", p.append_timestamp)
     print("Input Memory Cap", p.input_memory_cap)
     print("Output Memory Cap", p.output_memory_cap)
     print("Ignore Timeout", p.ignore_timeout)
