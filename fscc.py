@@ -25,7 +25,7 @@ import io
 import os
 
 if os.name == 'nt':
-    import win32file
+    import win32file, win32event
 else:
     import fcntl
 
@@ -152,7 +152,7 @@ class ReadonlyRegisterError(InvalidRegisterError):
         return "'%s' is a readonly register" % self.register_name
 
 
-class Port(io.FileIO):
+class Port(object):
     """Commtech FSCC port."""
     class Registers(object):
         """Registers on the FSCC port."""
@@ -309,12 +309,10 @@ class Port(io.FileIO):
                 None,  # no security
                 win32file.OPEN_EXISTING,
                 win32file.FILE_ATTRIBUTE_NORMAL |
-                    win32file.FILE_FLAG_OVERLAPPED,
+                win32file.FILE_FLAG_OVERLAPPED,
                 0)
         else:
             file_name = port_name
-
-        io.FileIO.__init__(self, file_name, mode)
 
         self.registers = Port.Registers(self)
 
@@ -572,10 +570,66 @@ class Port(io.FileIO):
 
     rx_multiple = property(fset=_set_rx_multiple, fget=_get_rx_multiple)
 
-    def read(self, max_bytes=4096):
+    def read(self, timeout=1000):
         """Reads data from the card."""
-        if max_bytes:
-            return super(io.FileIO, self).read(max_bytes)
+        _append_status = self.append_status
+        _append_timestamp = self.append_timestamp
+
+        if os.name == 'nt':
+            ol = win32file.OVERLAPPED()
+            ol.hEvent = win32event.CreateEvent(None, 0, 0, None)
+            buffer = win32file.AllocateReadBuffer(0xFFFF)
+            win32file.ReadFile(self.hComPort, buffer, ol)
+            r = win32event.WaitForSingleObject(ol.hEvent, timeout)
+
+            if r == win32event.WAIT_TIMEOUT:
+                win32file.CancelIo(self.hComPort)
+
+            if r == win32event.WAIT_TIMEOUT or \
+               r == win32event.WAIT_ABANDONED or \
+               r == win32event.WAIT_FAILED:
+                win32file.CloseHandle(ol.hEvent)
+                return (None, None, None)             
+
+            num_bytes = win32file.GetOverlappedResult(self.hComPort, ol, True)
+            data = bytes(buffer[0:num_bytes])
+            win32file.CloseHandle(ol.hEvent)
+        else:
+            data = '' #TODO
+
+        status, timestamp = None, None
+
+        if (_append_status and _append_timestamp):
+            status = data[-10:-8]
+            timestamp = struct.unpack('q', data[-8:])[0]
+            data = data[:-10]
+        elif (_append_status):
+            status = data[-2:]
+            data = data[:-2]
+        elif (_append_timestamp):
+            timestamp = struct.unpack('q', data[-8:])[0]
+            data = data[:-8]
+
+        if os.name == 'nt' and timestamp:
+            timestamp = timestamp / 10000000 - 11644473600
+
+        return (data, status, timestamp)
+        
+    def write(self, data):
+        if os.name == 'nt':
+            ol = win32file.OVERLAPPED()
+            ol.hEvent = win32event.CreateEvent(None, 0, 0, None)
+            win32file.WriteFile(self.hComPort, data, ol)
+            win32file.GetOverlappedResult(self.hComPort, ol, True)
+            win32file.CloseHandle(ol.hEvent)
+        else:
+            pass #TODO
+
+    def close(self):
+        if os.name == 'nt':
+            win32file.CloseHandle(self.hComPort)
+        else:
+            pass #TODO
 
     def can_read(self, timeout=100):
         """Checks whether there is data available to read."""
