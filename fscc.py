@@ -550,7 +550,7 @@ class Port(object):
 
     def _get_ignore_timeout(self):
         """Gets the value of the ignore timeout setting."""
-        return self._ioctl_get_boolean(FSCC_GET_APPEND_STATUS)
+        return self._ioctl_get_boolean(FSCC_GET_IGNORE_TIMEOUT)
 
     ignore_timeout = property(fset=_set_ignore_timeout,
                               fget=_get_ignore_timeout)
