@@ -21,11 +21,11 @@
 import struct
 import select
 import errno
-import io
 import os
 
 if os.name == 'nt':
     import win32file
+    import win32event
 else:
     import fcntl
 
@@ -119,7 +119,8 @@ else:
 
     FSCC_ENABLE_APPEND_TIMESTAMP = _IO(FSCC_IOCTL_MAGIC, 19)
     FSCC_DISABLE_APPEND_TIMESTAMP = _IO(FSCC_IOCTL_MAGIC, 20)
-    FSCC_GET_APPEND_TIMESTAMP = _IOR(FSCC_IOCTL_MAGIC, 21, struct.calcsize("P"))
+    FSCC_GET_APPEND_TIMESTAMP = _IOR(FSCC_IOCTL_MAGIC, 21,
+                                     struct.calcsize("P"))
 
 FSCC_UPDATE_VALUE = -2
 
@@ -152,7 +153,7 @@ class ReadonlyRegisterError(InvalidRegisterError):
         return "'%s' is a readonly register" % self.register_name
 
 
-class Port(io.FileIO):
+class Port(object):
     """Commtech FSCC port."""
     class Registers(object):
         """Registers on the FSCC port."""
@@ -298,23 +299,25 @@ class Port(io.FileIO):
                 if value >= 0:
                     export_file.write("%s = 0x%08x\n" % (register_name, value))
 
-    def __init__(self, port_name, mode, append_status=False):
+    def __init__(self, port_name, mode, append_status=True,
+                 append_timestamp=True):
 
         if os.name == 'nt':
             file_name = '\\\\.\\' + port_name
 
-            self.hComPort = win32file.CreateFile(file_name,
+            self.hComPort = win32file.CreateFile(
+                file_name,
                 win32file.GENERIC_READ | win32file.GENERIC_WRITE,
                 0,  # exclusive access
                 None,  # no security
                 win32file.OPEN_EXISTING,
                 win32file.FILE_ATTRIBUTE_NORMAL |
-                    win32file.FILE_FLAG_OVERLAPPED,
+                win32file.FILE_FLAG_OVERLAPPED,
                 0)
         else:
             file_name = port_name
 
-        io.FileIO.__init__(self, file_name, mode)
+            self.fd = os.open(file_name, os.O_RDWR)
 
         self.registers = Port.Registers(self)
 
@@ -322,6 +325,8 @@ class Port(io.FileIO):
             self.append_status = append_status
         except IOError:
             raise InvalidPortError(file_name)
+
+        self.append_timestamp = append_timestamp
 
     def _ioctl_action(self, ioctl_name):
         if os.name == 'nt':
@@ -335,7 +340,7 @@ class Port(io.FileIO):
                     raise
         else:
             try:
-                fcntl.ioctl(self, ioctl_name)
+                fcntl.ioctl(self.fd, ioctl_name)
             except IOError as e:
                 if e.errno == errno.EPROTONOSUPPORT:
                     raise AttributeError(NOT_SUPPORTED_TEXT)
@@ -359,7 +364,7 @@ class Port(io.FileIO):
                     raise
         else:
             try:
-                buf = fcntl.ioctl(self, ioctl_name, struct.pack('?', 0))
+                buf = fcntl.ioctl(self.fd, ioctl_name, struct.pack('?', 0))
             except IOError as e:
                 if e.errno == errno.EPROTONOSUPPORT:
                     raise AttributeError(NOT_SUPPORTED_TEXT)
@@ -385,7 +390,7 @@ class Port(io.FileIO):
                     raise
         else:
             try:
-                fcntl.ioctl(self, ioctl_name, value)
+                fcntl.ioctl(self.fd, ioctl_name, value)
             except IOError as e:
                 if e.errno == errno.EPROTONOSUPPORT:
                     raise AttributeError(NOT_SUPPORTED_TEXT)
@@ -410,7 +415,7 @@ class Port(io.FileIO):
                     raise
         else:
             try:
-                buf = fcntl.ioctl(self, ioctl_name, struct.pack(fmt, 0))
+                buf = fcntl.ioctl(self.fd, ioctl_name, struct.pack(fmt, 0))
             except IOError as e:
                 if e.errno == errno.EPROTONOSUPPORT:
                     raise AttributeError(NOT_SUPPORTED_TEXT)
@@ -438,7 +443,7 @@ class Port(io.FileIO):
                     raise
         else:
             try:
-                fcntl.ioctl(self, ioctl_name, value)
+                fcntl.ioctl(self.fd, ioctl_name, value)
             except IOError as e:
                 if e.errno == errno.EPROTONOSUPPORT:
                     raise AttributeError(NOT_SUPPORTED_TEXT)
@@ -461,7 +466,8 @@ class Port(io.FileIO):
                     raise
         else:
             try:
-                buf = fcntl.ioctl(self, ioctl_name, struct.pack(fmt, *initial))
+                buf = fcntl.ioctl(self.fd, ioctl_name,
+                                  struct.pack(fmt, *initial))
             except IOError as e:
                 if e.errno == errno.EPROTONOSUPPORT:
                     raise AttributeError(NOT_SUPPORTED_TEXT)
@@ -502,7 +508,8 @@ class Port(io.FileIO):
         """Gets the value of the append timestamp setting."""
         return self._ioctl_get_boolean(FSCC_GET_APPEND_TIMESTAMP)
 
-    append_timestamp = property(fset=_set_append_timestamp, fget=_get_append_timestamp)
+    append_timestamp = property(fset=_set_append_timestamp,
+                                fget=_get_append_timestamp)
 
     def _set_memcap(self, input_memcap, output_memcap):
         """Sets the value of the memory cap setting."""
@@ -570,10 +577,81 @@ class Port(io.FileIO):
 
     rx_multiple = property(fset=_set_rx_multiple, fget=_get_rx_multiple)
 
-    def read(self, max_bytes=4096):
+    def read(self, timeout=1000):
         """Reads data from the card."""
-        if max_bytes:
-            return super(io.FileIO, self).read(max_bytes)
+        _append_status = self.append_status
+        _append_timestamp = self.append_timestamp
+
+        if os.name == 'nt':
+            ol = win32file.OVERLAPPED()
+            ol.hEvent = win32event.CreateEvent(None, 0, 0, None)
+            buffer = win32file.AllocateReadBuffer(0xFFFF)
+            win32file.ReadFile(self.hComPort, buffer, ol)
+            r = win32event.WaitForSingleObject(ol.hEvent, timeout)
+
+            if r == win32event.WAIT_TIMEOUT:
+                win32file.CancelIo(self.hComPort)
+
+            if r == win32event.WAIT_TIMEOUT or \
+               r == win32event.WAIT_ABANDONED or \
+               r == win32event.WAIT_FAILED:
+                win32file.CloseHandle(ol.hEvent)
+                return (None, None, None)
+
+            num_bytes = win32file.GetOverlappedResult(self.hComPort, ol, True)
+            data = bytes(buffer[0:num_bytes])
+            win32file.CloseHandle(ol.hEvent)
+        else:
+            data = os.read(self.fd, 4096)
+
+        status, timestamp = None, None
+
+        if os.name == 'nt':
+            if (_append_status and _append_timestamp):
+                status = data[-10:-8]
+                timestamp = struct.unpack('q', data[-8:])[0]
+                data = data[:-10]
+            elif (_append_status):
+                status = data[-2:]
+                data = data[:-2]
+            elif (_append_timestamp):
+                timestamp = struct.unpack('q', data[-8:])[0]
+                data = data[:-8]
+
+            if timestamp:
+                timestamp = timestamp / 10000000 - 11644473600
+        else:
+            if (_append_status and _append_timestamp):
+                status = data[-18:-16]
+                timestamp = struct.unpack('ll', data[-16:])
+                data = data[:-18]
+            elif (_append_status):
+                status = data[-2:]
+                data = data[:-2]
+            elif (_append_timestamp):
+                timestamp = struct.unpack('ll', data[-16:])
+                data = data[:-16]
+
+            if timestamp:
+                timestamp = timestamp[0] + (float(timestamp[1]) / 1000000)
+
+        return (data, status, timestamp)
+
+    def write(self, data):
+        if os.name == 'nt':
+            ol = win32file.OVERLAPPED()
+            ol.hEvent = win32event.CreateEvent(None, 0, 0, None)
+            win32file.WriteFile(self.hComPort, data, ol)
+            win32file.GetOverlappedResult(self.hComPort, ol, True)
+            win32file.CloseHandle(ol.hEvent)
+        else:
+            os.write(self.fd, data)
+
+    def close(self):
+        if os.name == 'nt':
+            win32file.CloseHandle(self.hComPort)
+        else:
+            os.close(self.fd)
 
     def can_read(self, timeout=100):
         """Checks whether there is data available to read."""
@@ -622,7 +700,8 @@ if __name__ == '__main__':
     print("CCR2", hex(p.registers.CCR2))
     print("BGR", hex(p.registers.BGR))
 
-    p.append_status = False
+    p.append_status = True
+    p.append_timestamp = True
     p.input_memory_cap = 1000000
     p.output_memory_cap = 1000000
     p.ignore_timeout = False
@@ -630,5 +709,8 @@ if __name__ == '__main__':
     p.rx_modifiers = False
 
     p.purge()
+
+    p.write(b'U')
+    print(p.read())
 
     p.close()
