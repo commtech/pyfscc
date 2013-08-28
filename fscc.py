@@ -76,7 +76,7 @@ else:
     IO_READ = 0x80000000
 
     def FIX(x):
-        return struct.unpack("i", struct.pack("I", x))[0]
+        return struct.unpack('i', struct.pack('I', x))[0]
 
     def _IO(x, y):
         return FIX(IO_NONE | (x << 8) | y)
@@ -93,34 +93,34 @@ else:
 
     FSCC_IOCTL_MAGIC = 0x18
 
-    FSCC_GET_REGISTERS = _IOR(FSCC_IOCTL_MAGIC, 0, struct.calcsize("P"))
-    FSCC_SET_REGISTERS = _IOW(FSCC_IOCTL_MAGIC, 1, struct.calcsize("P"))
+    FSCC_GET_REGISTERS = _IOR(FSCC_IOCTL_MAGIC, 0, struct.calcsize('P'))
+    FSCC_SET_REGISTERS = _IOW(FSCC_IOCTL_MAGIC, 1, struct.calcsize('P'))
 
     FSCC_PURGE_TX = _IO(FSCC_IOCTL_MAGIC, 2)
     FSCC_PURGE_RX = _IO(FSCC_IOCTL_MAGIC, 3)
 
     FSCC_ENABLE_APPEND_STATUS = _IO(FSCC_IOCTL_MAGIC, 4)
     FSCC_DISABLE_APPEND_STATUS = _IO(FSCC_IOCTL_MAGIC, 5)
-    FSCC_GET_APPEND_STATUS = _IOR(FSCC_IOCTL_MAGIC, 13, struct.calcsize("P"))
+    FSCC_GET_APPEND_STATUS = _IOR(FSCC_IOCTL_MAGIC, 13, struct.calcsize('P'))
 
-    FSCC_SET_MEMORY_CAP = _IOW(FSCC_IOCTL_MAGIC, 6, struct.calcsize("P"))
-    FSCC_GET_MEMORY_CAP = _IOR(FSCC_IOCTL_MAGIC, 7, struct.calcsize("P"))
+    FSCC_SET_MEMORY_CAP = _IOW(FSCC_IOCTL_MAGIC, 6, struct.calcsize('P'))
+    FSCC_GET_MEMORY_CAP = _IOR(FSCC_IOCTL_MAGIC, 7, struct.calcsize('P'))
 
     FSCC_ENABLE_IGNORE_TIMEOUT = _IO(FSCC_IOCTL_MAGIC, 10)
     FSCC_DISABLE_IGNORE_TIMEOUT = _IO(FSCC_IOCTL_MAGIC, 11)
-    FSCC_GET_IGNORE_TIMEOUT = _IOR(FSCC_IOCTL_MAGIC, 15, struct.calcsize("P"))
+    FSCC_GET_IGNORE_TIMEOUT = _IOR(FSCC_IOCTL_MAGIC, 15, struct.calcsize('P'))
 
-    FSCC_SET_TX_MODIFIERS = _IOW(FSCC_IOCTL_MAGIC, 12, struct.calcsize("i"))
-    FSCC_GET_TX_MODIFIERS = _IOR(FSCC_IOCTL_MAGIC, 14, struct.calcsize("P"))
+    FSCC_SET_TX_MODIFIERS = _IOW(FSCC_IOCTL_MAGIC, 12, struct.calcsize('i'))
+    FSCC_GET_TX_MODIFIERS = _IOR(FSCC_IOCTL_MAGIC, 14, struct.calcsize('P'))
 
     FSCC_ENABLE_RX_MULTIPLE = _IO(FSCC_IOCTL_MAGIC, 16)
     FSCC_DISABLE_RX_MULTIPLE = _IO(FSCC_IOCTL_MAGIC, 17)
-    FSCC_GET_RX_MULTIPLE = _IOR(FSCC_IOCTL_MAGIC, 18, struct.calcsize("P"))
+    FSCC_GET_RX_MULTIPLE = _IOR(FSCC_IOCTL_MAGIC, 18, struct.calcsize('P'))
 
     FSCC_ENABLE_APPEND_TIMESTAMP = _IO(FSCC_IOCTL_MAGIC, 19)
     FSCC_DISABLE_APPEND_TIMESTAMP = _IO(FSCC_IOCTL_MAGIC, 20)
     FSCC_GET_APPEND_TIMESTAMP = _IOR(FSCC_IOCTL_MAGIC, 21,
-                                     struct.calcsize("P"))
+                                     struct.calcsize('P'))
 
 FSCC_UPDATE_VALUE = -2
 
@@ -157,15 +157,15 @@ class Port(object):
     """Commtech FSCC port."""
     class Registers(object):
         """Registers on the FSCC port."""
-        register_names = ["FIFOT", "CMDR", "STAR", "CCR0", "CCR1", "CCR2",
-                          "BGR", "SSR", "SMR", "TSR", "TMR", "RAR", "RAMR",
-                          "PPR", "TCR", "VSTR", "IMR", "DPLLR", "FCR"]
+        register_names = ['FIFOT', 'CMDR', 'STAR', 'CCR0', 'CCR1', 'CCR2',
+                          'BGR', 'SSR', 'SMR', 'TSR', 'TMR', 'RAR', 'RAMR',
+                          'PPR', 'TCR', 'VSTR', 'IMR', 'DPLLR', 'FCR']
 
-        readonly_register_names = ["STAR", "VSTR"]
-        writeonly_register_names = ["CMDR"]
+        readonly_register_names = ['STAR', 'VSTR']
+        writeonly_register_names = ['CMDR']
 
         editable_register_names = [r for r in register_names if r not in
-                                   ["STAR", "VSTR"]]
+                                   ['STAR', 'VSTR']]
 
         def __init__(self, port=None):
             self.port = port
@@ -202,17 +202,17 @@ class Port(object):
             """Gets the value of a register."""
             if self.port:
                 self._clear_registers()
-                setattr(self, "_%s" % register, FSCC_UPDATE_VALUE)
+                setattr(self, '_%s' % register, FSCC_UPDATE_VALUE)
                 self._get_registers()
 
-            return getattr(self, "_%s" % register)
+            return getattr(self, '_%s' % register)
 
         def _set_register(self, register, value):
             """Sets the value of a register."""
             if self.port:
                 self._clear_registers()
 
-            setattr(self, "_%s" % register, value)
+            setattr(self, '_%s' % register, value)
 
             if self.port:
                 self._set_registers()
@@ -229,7 +229,7 @@ class Port(object):
 
             registers = list(self)
 
-            fmt = "q" * len(registers)
+            fmt = 'q' * len(registers)
             regs = self.port._ioctl_get_struct(FSCC_GET_REGISTERS, fmt,
                                                registers)
 
@@ -244,21 +244,21 @@ class Port(object):
 
             registers = list(self)
 
-            fmt = "q" * len(registers)
+            fmt = 'q' * len(registers)
             value = struct.pack(fmt, *registers)
             self.port._ioctl_set_struct(FSCC_SET_REGISTERS, fmt, value)
 
         def _set_register_by_index(self, index, value):
             """Sets the value of a register by it's index."""
-            data = [("FIFOT", 2), ("CMDR", 5), ("STAR", 6), ("CCR0", 7),
-                    ("CCR1", 8), ("CCR2", 9), ("BGR", 10), ("SSR", 11),
-                    ("SMR", 12), ("TSR", 13), ("TMR", 14), ("RAR", 15),
-                    ("RAMR", 16), ("PPR", 17), ("TCR", 18), ("VSTR", 19),
-                    ("IMR", 21), ("DPLLR", 22), ("FCR", 23)]
+            data = [('FIFOT', 2), ('CMDR', 5), ('STAR', 6), ('CCR0', 7),
+                    ('CCR1', 8), ('CCR2', 9), ('BGR', 10), ('SSR', 11),
+                    ('SMR', 12), ('TSR', 13), ('TMR', 14), ('RAR', 15),
+                    ('RAMR', 16), ('PPR', 17), ('TCR', 18), ('VSTR', 19),
+                    ('IMR', 21), ('DPLLR', 22), ('FCR', 23)]
 
             for r, i in data:
                 if i == index:
-                    setattr(self, "_%s" % r, value)
+                    setattr(self, '_%s' % r, value)
 
         # Note: clears registers
         def import_from_file(self, import_file):
@@ -271,8 +271,8 @@ class Port(object):
                 except:
                     pass
 
-                if line[0] != "#":
-                    d = line.split("=")
+                if line[0] != '#':
+                    d = line.split('=')
                     reg_name, reg_val = d[0].strip().upper(), d[1].strip()
 
                     if reg_name not in self.register_names:
@@ -281,7 +281,7 @@ class Port(object):
                     if reg_name not in self.editable_register_names:
                         raise ReadonlyRegisterError(reg_name)
 
-                    if reg_val[0] == "0" and reg_val[1] in ["x", "X"]:
+                    if reg_val[0] == '0' and reg_val[1] in ['x', 'X']:
                         reg_val = int(reg_val, 16)
                     else:
                         reg_val = int(reg_val)
@@ -297,7 +297,7 @@ class Port(object):
                 value = getattr(self, register_name)
 
                 if value >= 0:
-                    export_file.write("%s = 0x%08x\n" % (register_name, value))
+                    export_file.write('%s = 0x%08x\n' % (register_name, value))
 
     def __init__(self, port_num, append_status=True, append_timestamp=True):
 
@@ -683,18 +683,18 @@ class Port(object):
 if __name__ == '__main__':
     p = Port(0)
 
-    print("Append Status", p.append_status)
-    print("Append Timestamp", p.append_timestamp)
-    print("Input Memory Cap", p.input_memory_cap)
-    print("Output Memory Cap", p.output_memory_cap)
-    print("Ignore Timeout", p.ignore_timeout)
-    print("Transmit Modifiers", p.tx_modifiers)
-    print("RX Multiple", p.rx_multiple)
+    print('Append Status', p.append_status)
+    print('Append Timestamp', p.append_timestamp)
+    print('Input Memory Cap', p.input_memory_cap)
+    print('Output Memory Cap', p.output_memory_cap)
+    print('Ignore Timeout', p.ignore_timeout)
+    print('Transmit Modifiers', p.tx_modifiers)
+    print('RX Multiple', p.rx_multiple)
 
-    print("CCR0", hex(p.registers.CCR0))
-    print("CCR1", hex(p.registers.CCR1))
-    print("CCR2", hex(p.registers.CCR2))
-    print("BGR", hex(p.registers.BGR))
+    print('CCR0', hex(p.registers.CCR0))
+    print('CCR1', hex(p.registers.CCR1))
+    print('CCR2', hex(p.registers.CCR2))
+    print('BGR', hex(p.registers.BGR))
 
     p.append_status = True
     p.append_timestamp = True
