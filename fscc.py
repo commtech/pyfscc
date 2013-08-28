@@ -299,11 +299,10 @@ class Port(object):
                 if value >= 0:
                     export_file.write("%s = 0x%08x\n" % (register_name, value))
 
-    def __init__(self, port_name, mode, append_status=True,
-                 append_timestamp=True):
+    def __init__(self, port_num, append_status=True, append_timestamp=True):
 
         if os.name == 'nt':
-            file_name = '\\\\.\\' + port_name
+            file_name = '\\\\.\\fscc' + str(port_num)
 
             self.hComPort = win32file.CreateFile(
                 file_name,
@@ -315,7 +314,7 @@ class Port(object):
                 win32file.FILE_FLAG_OVERLAPPED,
                 0)
         else:
-            file_name = port_name
+            file_name = '/dev/fscc' + str(port_num)
 
             self.fd = os.open(file_name, os.O_RDWR)
 
@@ -682,10 +681,7 @@ class Port(object):
             return False
 
 if __name__ == '__main__':
-    if os.name == 'nt':
-        p = Port('FSCC0', 'rb')
-    else:
-        p = Port('/dev/fscc0', 'rb')
+    p = Port(0)
 
     print("Append Status", p.append_status)
     print("Append Timestamp", p.append_timestamp)
