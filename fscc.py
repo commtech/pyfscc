@@ -22,9 +22,12 @@ import struct
 import select
 import errno
 import os
-from ctypes import cdll
+import ctypes
 
-lib = cdll.LoadLibrary('./libcfscc.so')
+if os.name == 'nt':
+    lib = ctypes.cdll.LoadLibrary('./cfscc.dll')
+else:
+    lib = ctypes.cdll.LoadLibrary('./libcfscc.so')
 
 if os.name == 'nt':
     import win32file
@@ -589,7 +592,10 @@ class Port(object):
 
     def _set_clock_frequency(self, frequency):
         """Sets the value of the clock frequency setting."""
-        lib.fscc_set_clock_frequency(self.fd, frequency)
+        if os.name == 'nt':
+            lib.fscc_set_clock_frequency(self.hComPort.handle, frequency)
+        else:
+            lib.fscc_set_clock_frequency(self.fd, frequency)
 
     clock_frequency = property(fset=_set_clock_frequency)
 
