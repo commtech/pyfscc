@@ -22,6 +22,9 @@ import struct
 import select
 import errno
 import os
+from ctypes import cdll
+
+lib = cdll.LoadLibrary('./libcfscc.so')
 
 if os.name == 'nt':
     import win32file
@@ -576,6 +579,12 @@ class Port(object):
 
     rx_multiple = property(fset=_set_rx_multiple, fget=_get_rx_multiple)
 
+    def _set_clock_frequency(self, frequency):
+        """Sets the value of the clock frequency setting."""
+        lib.fscc_set_clock_frequency(self.fd, frequency)
+
+    clock_frequency = property(fset=_set_clock_frequency)
+
     def read(self, timeout=1000):
         """Reads data from the card."""
         _append_status = self.append_status
@@ -703,6 +712,7 @@ if __name__ == '__main__':
     p.ignore_timeout = False
     p.tx_modifiers = 0
     p.rx_modifiers = False
+    p.clock_frequency = 1000000
 
     p.purge()
 
