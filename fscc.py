@@ -299,6 +299,44 @@ class Port(object):
                 if value >= 0:
                     export_file.write("%s = 0x%08x\n" % (register_name, value))
 
+
+    class MemoryCap(object):
+
+        def __init__(self, port=None):
+            self.port = port
+
+        def _set_memcap(self, input_memcap, output_memcap):
+            """Sets the value of the memory cap setting."""
+            fmt = 'i' * 2
+            value = struct.pack(fmt, input_memcap, output_memcap)
+            self.port._ioctl_set_struct(FSCC_SET_MEMORY_CAP, fmt, value)
+
+        def _get_memcap(self):
+            """Gets the value of the memory cap setting."""
+            fmt = 'i' * 2
+            return self.port._ioctl_get_struct(FSCC_GET_MEMORY_CAP, fmt, (-1, -1))
+
+        def _set_imemcap(self, memcap):
+            """Sets the value of the input memory cap setting."""
+            self._set_memcap(memcap, -1)
+
+        def _get_imemcap(self):
+            """Gets the value of the output memory cap setting."""
+            return self._get_memcap()[0]
+
+        input = property(fset=_set_imemcap, fget=_get_imemcap)
+
+        def _set_omemcap(self, memcap):
+            """Sets the value of the output memory cap setting."""
+            self._set_memcap(-1, memcap)
+
+        def _get_omemcap(self):
+            """Gets the value of the output memory cap setting."""
+            return self._get_memcap()[1]
+
+        output = property(fset=_set_omemcap, fget=_get_omemcap)
+
+
     def __init__(self, port_num, append_status=True, append_timestamp=True):
 
         if os.name == 'nt':
@@ -319,6 +357,7 @@ class Port(object):
             self.fd = os.open(file_name, os.O_RDWR)
 
         self.registers = Port.Registers(self)
+        self.memory_cap = Port.MemoryCap(self)
 
         try:
             self.append_status = append_status
@@ -510,37 +549,6 @@ class Port(object):
     append_timestamp = property(fset=_set_append_timestamp,
                                 fget=_get_append_timestamp)
 
-    def _set_memcap(self, input_memcap, output_memcap):
-        """Sets the value of the memory cap setting."""
-        fmt = 'i' * 2
-        value = struct.pack(fmt, input_memcap, output_memcap)
-        self._ioctl_set_struct(FSCC_SET_MEMORY_CAP, fmt, value)
-
-    def _get_memcap(self):
-        """Gets the value of the memory cap setting."""
-        fmt = 'i' * 2
-        return self._ioctl_get_struct(FSCC_GET_MEMORY_CAP, fmt, (-1, -1))
-
-    def _set_imemcap(self, memcap):
-        """Sets the value of the input memory cap setting."""
-        self._set_memcap(memcap, -1)
-
-    def _get_imemcap(self):
-        """Gets the value of the output memory cap setting."""
-        return self._get_memcap()[0]
-
-    input_memory_cap = property(fset=_set_imemcap, fget=_get_imemcap)
-
-    def _set_omemcap(self, memcap):
-        """Sets the value of the output memory cap setting."""
-        self._set_memcap(-1, memcap)
-
-    def _get_omemcap(self):
-        """Gets the value of the output memory cap setting."""
-        return self._get_memcap()[1]
-
-    output_memory_cap = property(fset=_set_omemcap, fget=_get_omemcap)
-
     def _set_ignore_timeout(self, ignore_timeout):
         """Sets the value of the ignore timeout setting."""
         self._ioctl_set_boolean(FSCC_ENABLE_IGNORE_TIMEOUT,
@@ -685,8 +693,8 @@ if __name__ == '__main__':
 
     print("Append Status", p.append_status)
     print("Append Timestamp", p.append_timestamp)
-    print("Input Memory Cap", p.input_memory_cap)
-    print("Output Memory Cap", p.output_memory_cap)
+    print("Input Memory Cap", p.memory_cap.input)
+    print("Output Memory Cap", p.memory_cap.output)
     print("Ignore Timeout", p.ignore_timeout)
     print("Transmit Modifiers", p.tx_modifiers)
     print("RX Multiple", p.rx_multiple)
@@ -698,8 +706,8 @@ if __name__ == '__main__':
 
     p.append_status = True
     p.append_timestamp = True
-    p.input_memory_cap = 1000000
-    p.output_memory_cap = 1000000
+    p.memory_cap.input = 1000000
+    p.memory_cap.output = 1000000
     p.ignore_timeout = False
     p.tx_modifiers = 0
     p.rx_modifiers = False
