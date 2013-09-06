@@ -58,5 +58,5 @@ bgr = p.registers.BGR
 
 
 ### Additional Resources
-- Complete example: [`examples\registers.py`](https://github.com/commtech/netfscc/blob/master/examples/registers.py)
-- Implemenation details: [`src\fscc.py`](https://github.com/commtech/netfscc/blob/master/src/fscc.py)
+- Complete example: [`examples\registers.py`](https://github.com/commtech/pyfscc/blob/master/examples/registers.py)
+- Implemenation details: [`src\fscc.py`](https://github.com/commtech/pyfscc/blob/master/src/fscc.py)

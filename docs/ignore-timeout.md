@@ -45,5 +45,5 @@ p.ignore_timeout = False
 
 
 ### Additional Resources
-- Complete example: [`examples\ignore-timeout.py`](https://github.com/commtech/netfscc/blob/master/examples/ignore-timeout.py)
-- Implemenation details: [`fscc.py`](https://github.com/commtech/netfscc/blob/master/fscc.py)
+- Complete example: [`examples\ignore-timeout.py`](https://github.com/commtech/pyfscc/blob/master/examples/ignore-timeout.py)
+- Implemenation details: [`fscc.py`](https://github.com/commtech/pyfscc/blob/master/fscc.py)

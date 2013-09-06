@@ -42,5 +42,5 @@ p.tx_modifiers = XF | XREP
 
 
 ### Additional Resources
-- Complete example: [`examples\tx-modifiers.py`](https://github.com/commtech/netfscc/blob/master/examples/tx-modifiers.py)
-- Implemenation details: [`fscc.py`](https://github.com/commtech/netfscc/blob/master/fscc.py)
+- Complete example: [`examples\tx-modifiers.py`](https://github.com/commtech/pyfscc/blob/master/examples/tx-modifiers.py)
+- Implemenation details: [`fscc.py`](https://github.com/commtech/pyfscc/blob/master/fscc.py)

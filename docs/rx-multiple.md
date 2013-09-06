@@ -45,5 +45,5 @@ p.rx_multiple = False
 
 
 ### Additional Resources
-- Complete example: [`examples\rx-multiple.py`](https://github.com/commtech/netfscc/blob/master/examples/rx-multiple.py)
-- Implemenation details: [`fscc.py`](https://github.com/commtech/netfscc/blob/master/fscc.py)
+- Complete example: [`examples\rx-multiple.py`](https://github.com/commtech/pyfscc/blob/master/examples/rx-multiple.py)
+- Implemenation details: [`fscc.py`](https://github.com/commtech/pyfscc/blob/master/fscc.py)

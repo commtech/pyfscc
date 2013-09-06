@@ -43,5 +43,5 @@ p.Purge(False, True)
 
 
 ### Additional Resources
-- Complete example: [`examples\purge.py`](https://github.com/commtech/netfscc/blob/master/examples/purge.py)
-- Implemenation details: [`src\fscc.py`](https://github.com/commtech/netfscc/blob/master/src/fscc.py)
+- Complete example: [`examples\purge.py`](https://github.com/commtech/pyfscc/blob/master/examples/purge.py)
+- Implemenation details: [`src\fscc.py`](https://github.com/commtech/pyfscc/blob/master/src/fscc.py)

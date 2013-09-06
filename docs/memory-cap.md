@@ -37,5 +37,5 @@ p.memory_cap.output = 1000000
 
 
 ### Additional Resources
-- Complete example: [`examples\append-status.py`](https://github.com/commtech/netfscc/blob/master/examples/append-status.py)
-- Implemenation details: [`src\Fscc.py`](https://github.com/commtech/netfscc/blob/master/fscc.py)
+- Complete example: [`examples\append-status.py`](https://github.com/commtech/pyfscc/blob/master/examples/append-status.py)
+- Implemenation details: [`src\Fscc.py`](https://github.com/commtech/pyfscc/blob/master/fscc.py)

@@ -52,5 +52,5 @@ p.append_status = False
 
 
 ### Additional Resources
-- Complete example: [`examples\append-status.py`](https://github.com/commtech/netfscc/blob/master/examples/append-status.py)
-- Implemenation details: [`fscc.py`](https://github.com/commtech/netfscc/blob/master/fscc.py)
+- Complete example: [`examples\append-status.py`](https://github.com/commtech/pyfscc/blob/master/examples/append-status.py)
+- Implemenation details: [`fscc.py`](https://github.com/commtech/pyfscc/blob/master/fscc.py)
