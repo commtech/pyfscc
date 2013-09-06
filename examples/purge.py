@@ -1,7 +1,7 @@
 import fscc
 
 if __name__ == '__main__':
-    p = Port(0)
+    p = fscc.Port(0)
 
     # Purge TX
     p.purge(True, False)
@@ -9,5 +9,5 @@ if __name__ == '__main__':
     # Purge RX
     p.purge(False, True)
 
-	# Purge both TX & RX
+    # Purge both TX & RX
     p.purge(True, True)

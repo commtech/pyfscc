@@ -26,14 +26,14 @@ if __name__ == '__main__':
     p = Port(0)
 
     p.write(b'Hello world!')
-    print(p.read())
+    print(p.read()[0])
 ```
 
 Now attach the included loopback connector.
 
 ```
 # python tutorial.py
-Hello world!
+b'Hello world!'
 ```
 
 You have now transmitted and received an HDLC frame! 
