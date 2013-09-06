@@ -27,7 +27,7 @@ clock_frequency = property(...)
 
 ## Set
 ###### Examples
-```c#
+```python
 import fscc
 ...
 

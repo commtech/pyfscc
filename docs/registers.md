@@ -26,132 +26,37 @@ effect.
 | -------------- | --------
 | `fscc-windows` | `v2.0.0` 
 | `fscc-linux`   | `v2.0.0` 
+| `pyfscc`       | `v1.0.0`
 
 
-## Structure
-```c
-struct fscc_registers {
-    /* BAR 0 */
-    fscc_register reserved1[2];
-
-    fscc_register FIFOT;
-
-    fscc_register reserved2[2];
-
-    fscc_register CMDR;
-    fscc_register STAR; /* Read-only */
-    fscc_register CCR0;
-    fscc_register CCR1;
-    fscc_register CCR2;
-    fscc_register BGR;
-    fscc_register SSR;
-    fscc_register SMR;
-    fscc_register TSR;
-    fscc_register TMR;
-    fscc_register RAR;
-    fscc_register RAMR;
-    fscc_register PPR;
-    fscc_register TCR;
-    fscc_register VSTR; /* Read-only */
-
-    fscc_register reserved3[1];
-
-    fscc_register IMR;
-    fscc_register DPLLR;
-
-    /* BAR 2 */
-    fscc_register FCR;
-};
+## Property
+```python
+registers = property(...)
 ```
-
-
-## Macros
-```c
-FSCC_REGISTERS_INIT(regs)
-```
-
-| Parameter | Type                      | Description
-| --------- | ------------------------- | -----------------------
-| `regs`    | `struct fscc_registers *` | The registers structure to initialize
-
-The `FSCC_REGISTERS_INIT` macro should be called each time you use the 
-`struct fscc_registers` structure. An initialized structure will allow you to 
-only set/receive the registers you need.
 
 
 ## Set
-```c
-int fscc_set_registers(fscc_handle h, struct fscc_registers *regs)
-```
-
-| Parameter | Type                      | Description
-| --------- | ------------------------- | -----------------------------------
-| `h`       | `fscc_handle`             | The handle to your port
-| `regs`    | `struct fscc_registers *` | The registers you would like to set
-
-| Return Value | Cause
-| ------------ | ------------------------------------------------------------------
-| 0            | Success
-
 ###### Examples
-```
-#include <fscc.h>
+```python
+import fscc
 ...
 
-struct fscc_registers registers;
-
-FSCC_REGISTERS_INIT(registers);
-
-registers.CCR0 = 0x0011201c;
-registers.BGR = 10;
-
-fscc_set_registers(h, &registers);
+p.registers.CCR0 = 0x0011201c
+p.registers.BGR = 10
 ```
-
-###### Support
-| Code           | Version
-| -------------- | --------
-| `cfscc`        | `v1.0.0`
 
 
 ## Get
-```c
-int fscc_get_registers(fscc_handle h, struct fscc_registers *regs)
-```
-
-| Parameter | Type                      | Description
-| --------- | ------------------------- | -----------------------
-| `h`       | `fscc_handle`             | The handle to your port
-| `regs`    | `struct fscc_registers *` | The register values you would like to view
-
-| Return Value | Cause
-| ------------ | ------------------------------------------------------------------
-| 0            | Success
-
 ###### Examples
-```
-#include <fscc.h>
+```python
+import fscc
 ...
 
-struct fscc_registers registers;
-
-FSCC_REGISTERS_INIT(registers);
-
-registers.CCR0 = FSCC_UPDATE_VALUE;
-registers.BGR = FSCC_UPDATE_VALUE;
-
-fscc_get_registers(h, &registers);
+ccr0 = p.registers.CCR0
+bgr = p.registers.BGR
 ```
-
-At this point `regs.CCR0` and `regs.BGR` would be set to their respective
-values.
-
-###### Support
-| Code           | Version
-| -------------- | --------
-| `cfscc`        | `v1.0.0`
 
 
 ### Additional Resources
-- Complete example: [`examples\registers.cs`](https://github.com/commtech/netfscc/blob/master/examples/registers.cs)
-- Implemenation details: [`src\Fscc.c`](https://github.com/commtech/netfscc/blob/master/src/Fscc.cs)
+- Complete example: [`examples\registers.py`](https://github.com/commtech/netfscc/blob/master/examples/registers.py)
+- Implemenation details: [`src\fscc.py`](https://github.com/commtech/netfscc/blob/master/src/fscc.py)
