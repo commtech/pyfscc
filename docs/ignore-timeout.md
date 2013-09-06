@@ -1,0 +1,49 @@
+# Ignore Timeout
+
+###### Support
+| Code           | Version
+| -------------- | --------
+| `fscc-windows` | `v2.0.0`
+| `fscc-linux`   | `v2.0.0`
+| `pyfscc`       | `v1.0.0`
+
+
+## Property
+```python
+append_timestamp = property(...)
+```
+
+
+## Get
+###### Examples
+```python
+import fscc
+...
+
+status = p.ignore_timeout
+```
+
+
+## Enable
+###### Examples
+```python
+import fscc
+...
+
+p.ignore_timeout = True
+```
+
+
+## Disable
+###### Examples
+```python
+import fscc
+...
+
+p.ignore_timeout = False
+```
+
+
+### Additional Resources
+- Complete example: [`examples\ignore-timeout.py`](https://github.com/commtech/netfscc/blob/master/examples/ignore-timeout.py)
+- Implemenation details: [`fscc.py`](https://github.com/commtech/netfscc/blob/master/fscc.py)
