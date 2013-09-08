@@ -16,6 +16,11 @@ to clear this data and start fresh, there are a couple of methods you can use.
 def purge(self, tx=True, rx=True)
 ```
 
+| Parameter | Type      | Default | Description
+| --------- | --------- | ------- | ----------------------------------
+| `tx`      | `Boolean` | True    | Whether to purge the transmit data
+| `rx`      | `Boolean` | True    | Whether to purge the receive data
+
 ###### Examples
 Purge both the transmit and receive data.
 ```python

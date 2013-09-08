@@ -32,7 +32,7 @@ import fscc
 ...
 
 p.memory_cap.input = 1000000
-p.memory_cap.output = 1000000
+p.memory_cap.output = 2000000
 ```
 
 

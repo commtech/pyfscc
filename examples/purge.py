@@ -3,11 +3,11 @@ import fscc
 if __name__ == '__main__':
     p = fscc.Port(0)
 
-    # Purge TX
+    # TX
     p.purge(True, False)
 
-    # Purge RX
+    # RX
     p.purge(False, True)
 
-    # Purge both TX & RX
+    # TX & RX
     p.purge(True, True)
