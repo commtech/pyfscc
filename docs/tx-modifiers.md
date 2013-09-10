@@ -27,7 +27,7 @@ tx_modifiers = property(...)
 import fscc
 ...
 
-status = p.tx_modifiers
+modifiers = p.tx_modifiers
 ```
 
 

@@ -52,8 +52,8 @@ p.registers.BGR = 10
 import fscc
 ...
 
-ccr0 = p.registers.CCR0
-bgr = p.registers.BGR
+ccr1 = p.registers.CCR1
+ccr2 = p.registers.CCR2
 ```
 
 
