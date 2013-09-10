@@ -23,11 +23,18 @@ import select
 import errno
 import os
 import ctypes
+import sys
 
-if os.name == 'nt':
-    lib = ctypes.cdll.LoadLibrary('./cfscc.dll')
-else:
-    lib = ctypes.cdll.LoadLibrary('./libcfscc.so')
+try:
+    if os.name == 'nt':
+        lib = ctypes.cdll.LoadLibrary(os.path.join(sys.prefix, 'DLLs\cfscc.dll'))
+    else:
+        lib = ctypes.cdll.LoadLibrary(os.path.join(sys.prefix, 'DLLs/libcfscc.so'))
+except:
+    if os.name == 'nt':
+        lib = ctypes.cdll.LoadLibrary('cfscc.dll')
+    else:
+        lib = ctypes.cdll.LoadLibrary('libcfscc.so')
 
 if os.name == 'nt':
     import win32file
