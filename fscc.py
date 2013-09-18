@@ -687,10 +687,11 @@ class Port(object):
             ol = win32file.OVERLAPPED()
             ol.hEvent = win32event.CreateEvent(None, 0, 0, None)
             win32file.WriteFile(self.hComPort, data, ol)
-            win32file.GetOverlappedResult(self.hComPort, ol, True)
+            bytes_written = win32file.GetOverlappedResult(self.hComPort, ol, True)
             win32file.CloseHandle(ol.hEvent)
+            return bytes_written
         else:
-            os.write(self.fd, data)
+            return os.write(self.fd, data)
 
     def close(self):
         if os.name == 'nt':
