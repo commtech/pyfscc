@@ -32,7 +32,7 @@ def init(p):
     p.registers.DPLLR = 0x00000004
     p.registers.FCR = 0x00000000
 
-    p.clock_frequency = 1000000
+    p.clock_frequency = 18432000
 
     p.purge(True, True)
 
