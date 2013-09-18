@@ -737,7 +737,7 @@ if __name__ == '__main__':
     p.ignore_timeout = False
     p.tx_modifiers = 0
     p.rx_modifiers = False
-    p.clock_frequency = 1000000
+    p.clock_frequency = 18432000
 
     p.purge()
 
