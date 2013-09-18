@@ -37,4 +37,4 @@ p.clock_frequency = 18432000
 
 ### Additional Resources
 - Complete example: [`examples\clock-frequency.py`](https://github.com/commtech/pyfscc/blob/master/examples/clock-frequency.py)
-- Implemenation details: [`src\fscc.py`](https://github.com/commtech/pyfscc/blob/master/src/fscc.py)
+- Implemenation details: [`fscc.py`](https://github.com/commtech/pyfscc/blob/master/fscc.py)

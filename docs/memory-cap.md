@@ -20,8 +20,8 @@ memory_cap = property(...)
 import fscc
 ...
 
-input = p.memory_cap.input
-output = p.memory_cap.output
+input_cap = p.memory_cap.input
+output_cap = p.memory_cap.output
 ```
 
 
@@ -37,5 +37,5 @@ p.memory_cap.output = 2000000
 
 
 ### Additional Resources
-- Complete example: [`examples\append-status.py`](https://github.com/commtech/pyfscc/blob/master/examples/append-status.py)
-- Implemenation details: [`src\Fscc.py`](https://github.com/commtech/pyfscc/blob/master/fscc.py)
+- Complete example: [`examples\memory-cap.py`](https://github.com/commtech/pyfscc/blob/master/examples/memory-cap.py)
+- Implemenation details: [`fscc.py`](https://github.com/commtech/pyfscc/blob/master/fscc.py)

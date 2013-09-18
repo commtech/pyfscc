@@ -22,10 +22,10 @@ def __init__(self, port_num, append_status=True, append_timestamp=True)
 import fscc
 ...
 
-p = Port(0)
+p = fscc.Port(0)
 ```
 
 
 ### Additional Resources
 - Complete example: [`examples\tutorial.py`](https://github.com/commtech/pyfscc/blob/master/examples/tutorial.py)
-- Implemenation details: [`src\fscc.py`](https://github.com/commtech/pyfscc/blob/master/src/fscc.py)
+- Implemenation details: [`fscc.py`](https://github.com/commtech/pyfscc/blob/master/scc.py)

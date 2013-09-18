@@ -4,9 +4,9 @@ This README file is best viewed [online](http://github.com/commtech/pyfscc/).
 ## Installing Library
 
 ##### Downloading Library
-- You can use the pre-built driver package that is included with the driver
+- You can use the pre-built library files that are included with the driver
 - Or, you can download the latest library version from
-[Github releases](https://github.com/commtech/netfscc/releases).
+[Github releases](https://github.com/commtech/pyfscc/releases).
 
 
 ## Quick Start Guide
@@ -16,14 +16,13 @@ Lets get started with a quick programming example for fun.
 _This tutorial has already been set up for you at_ 
 [`examples/tutorial.py`](https://github.com/commtech/pyfscc/tree/master/examples/tutorial.py).
 
-First, drop `netfscc.dll` and `cfscc.dll` into a test directory. Now that those files are 
-copied over, create a new C# file (named tutorial.cs) with the following code.
+First, create a new Python file (named tutorial.py) with the following code.
 
 ```python
 import fscc
 
 if __name__ == '__main__':
-    p = Port(0)
+    p = fscc.Port(0)
 
     p.write(b'Hello world!')
     print(p.read()[0])
@@ -54,7 +53,7 @@ own program. All of these options are described on their respective documentatio
 - [Purge](https://github.com/commtech/pyfscc/blob/master/docs/purge.md)
 - [Registers](https://github.com/commtech/pyfscc/blob/master/docs/registers.md)
 - [TX Modifiers](https://github.com/commtech/pyfscc/blob/master/docs/tx-modifiers.md)
-- [Read](https://github.com/commtech/pyfscc/blob/master/docs/write.md)
+- [Writes](https://github.com/commtech/pyfscc/blob/master/docs/write.md)
 - [Read](https://github.com/commtech/pyfscc/blob/master/docs/read.md)
 
 

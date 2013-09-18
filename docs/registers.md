@@ -59,4 +59,4 @@ ccr2 = p.registers.CCR2
 
 ### Additional Resources
 - Complete example: [`examples\registers.py`](https://github.com/commtech/pyfscc/blob/master/examples/registers.py)
-- Implemenation details: [`src\fscc.py`](https://github.com/commtech/pyfscc/blob/master/src/fscc.py)
+- Implemenation details: [`fscc.py`](https://github.com/commtech/pyfscc/blob/master/fscc.py)
