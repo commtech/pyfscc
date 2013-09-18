@@ -58,7 +58,8 @@ own program. All of these options are described on their respective documentatio
 
 
 ## Dependencies
-TODO
+- Python 3
+- pywin32 (for Windows)
 
 
 ## API Compatibility
