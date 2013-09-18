@@ -142,15 +142,6 @@ XF, XREP, TXT, TXEXT = 0, 1, 2, 4
 NOT_SUPPORTED_TEXT = 'This feature isn\'t supported on this port.'
 
 
-class InvalidPortError(Exception):
-    """Exception for the situation where a non FSCC port is opened."""
-    def __init__(self, file_name):
-        self.file_name = file_name
-
-    def __str__(self):
-        return "'%s' is not an FSCC port" % self.file_name
-
-
 class InvalidRegisterError(Exception):
     """Exception for the situation where an invalid register is modified."""
     def __init__(self, register_name):
@@ -372,11 +363,7 @@ class Port(object):
         self.registers = Port.Registers(self)
         self.memory_cap = Port.MemoryCap(self)
 
-        try:
-            self.append_status = append_status
-        except IOError:
-            raise InvalidPortError(file_name)
-
+        self.append_status = append_status
         self.append_timestamp = append_timestamp
 
     def _ioctl_action(self, ioctl_name):
