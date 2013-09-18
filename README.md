@@ -9,6 +9,15 @@ This README file is best viewed [online](http://github.com/commtech/pyfscc/).
 [Github releases](https://github.com/commtech/pyfscc/releases).
 
 
+##### Installing Driver
+If you are not using the included Windows installer, you can install the library
+by using the setup script.
+
+```
+python setup.py install
+```
+
+
 ## Quick Start Guide
 
 Lets get started with a quick programming example for fun.
