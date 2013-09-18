@@ -18,6 +18,10 @@ def write(self, data):
 | ------------ | ------- | ---------------------------
 | `buf`        | `bytes` | The data buffer to transmit
 
+| Return
+| ---------------------------
+| Number of bytes transmitted
+
 ###### Examples
 ```c
 import fscc
