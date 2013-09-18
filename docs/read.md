@@ -32,78 +32,28 @@ bug developers introduce while trying to cancel I/O operations when using OVERLA
 | -------------- | --------
 | `fscc-windows` | `v2.0.0` 
 | `fscc-linux`   | `v2.0.0` 
+| `pyfscc`       | `v1.0.0`
 
 
 ## Read
-```c
-int fscc_read(fscc_handle h, char *buf, unsigned size, unsigned *bytes_read, OVERLAPPED *o)
+```python
+def read(self, timeout=None, size=4096):
 ```
 
-| Parameter    | Type             | Description
-| ------------ | ---------------- | -----------------------
-| `h`          | `fscc_handle`    | The handle to your port
-| `buf`        | `char *`         | The data buffer to hold incoming data
-| `size`       | `unsigned`       | The data buffer size
-| `bytes_read` | `unsigned *`     | How many bytes were returned from the read
-| `o`          | `OVERLAPPED *`   | [Overlapped IO structure](http://msdn.microsoft.com/en-us/library/windows/desktop/ms686358.aspx)
-
-| Return Value            | Cause
-| ----------------------- | ------------------------------------------------------------------
-| 0                       | Success
-| `FSCC_BUFFER_TOO_SMALL` | The read size is smaller than the next frame (in a frame based mode)
+| Parameter    | Type  | Default | Description
+| ------------ | ----- | ------- | ---------------------------------------------------------
+| `timeout`    | `int` | None    | Number of milliseconds to wait for data before timing out
+| `size`       | `int` | 4096    | The data buffer size
 
 ###### Examples
-```c
-#include <fscc.h>
+```python
+import fscc
 ...
 
-char idata[20] = {0};
-unsigned bytes_read;
-
-fscc_read(h, idata, sizeof(idata), &bytes_read, NULL);
+p.read(100)
 ```
-
-###### Support
-| Code           | Version
-| -------------- | --------
-| `cfscc`        | `v1.0.0`
-
-
-## Read (Timeout)
-```c
-int fscc_read_with_timeout(fscc_handle h, char *buf, unsigned size, unsigned *bytes_read, unsigned timeout)
-```
-
-| Parameter    | Type             | Description
-| ------------ | ---------------- | -----------------------
-| `h`          | `fscc_handle`    | The handle to your port
-| `buf`        | `char *`         | The data buffer to hold incoming data
-| `size`       | `unsigned`       | The data buffer size
-| `bytes_read` | `unsigned *`     | How many bytes were returned from the read
-| `timeout`    | `unsigned`       | Number of milliseconds to wait for data before timing out
-
-| Return Value            | Cause
-| ----------------------- | ------------------------------------------------------------------
-| 0                       | Success
-| `FSCC_BUFFER_TOO_SMALL` | The read size is smaller than the next frame (in a frame based mode)
-
-###### Examples
-```c
-#include <fscc.h>
-...
-
-char idata[20] = {0};
-unsigned bytes_read;
-
-fscc_read_with_timeout(h, idata, sizeof(idata), &bytes_read, 100);
-```
-
-###### Support
-| Code           | Version
-| -------------- | --------
-| `cfscc`        | `v1.0.0`
 
 
 ### Additional Resources
-- Complete example: [`examples\tutorial.cs`](https://github.com/commtech/netfscc/blob/master/examples/tutorial.cs)
-- Implemenation details: [`src\Fscc.cs`](https://github.com/commtech/netfscc/blob/master/src/Fscc.cs)
+- Complete example: [`examples\tutorial.py`](https://github.com/commtech/netfscc/blob/master/examples/tutorial.py)
+- Implemenation details: [`fscc.py`](https://github.com/commtech/netfscc/blob/master/fscc.py)
