@@ -606,32 +606,9 @@ class Port(object):
 
     clock_frequency = property(fset=_set_clock_frequency)
 
-    def read(self, timeout=1000):
-        """Reads data from the card."""
+    def __parse_output(self, data):
         _append_status = self.append_status
         _append_timestamp = self.append_timestamp
-
-        if os.name == 'nt':
-            ol = win32file.OVERLAPPED()
-            ol.hEvent = win32event.CreateEvent(None, 0, 0, None)
-            buffer = win32file.AllocateReadBuffer(0xFFFF)
-            win32file.ReadFile(self.hComPort, buffer, ol)
-            r = win32event.WaitForSingleObject(ol.hEvent, timeout)
-
-            if r == win32event.WAIT_TIMEOUT:
-                win32file.CancelIo(self.hComPort)
-
-            if r == win32event.WAIT_TIMEOUT or \
-               r == win32event.WAIT_ABANDONED or \
-               r == win32event.WAIT_FAILED:
-                win32file.CloseHandle(ol.hEvent)
-                return (None, None, None)
-
-            num_bytes = win32file.GetOverlappedResult(self.hComPort, ol, True)
-            data = bytes(buffer[0:num_bytes])
-            win32file.CloseHandle(ol.hEvent)
-        else:
-            data = os.read(self.fd, 4096)
 
         status, timestamp = None, None
 
@@ -665,6 +642,45 @@ class Port(object):
                 timestamp = timestamp[0] + (float(timestamp[1]) / 1000000)
 
         return (data, status, timestamp)
+
+        return self.__parse_output(data)
+
+    def read(self, timeout=None, size=4096):
+        """Reads data from the card."""
+        if timeout:
+            if os.name == 'nt':
+                ol = win32file.OVERLAPPED()
+                ol.hEvent = win32event.CreateEvent(None, 0, 0, None)
+                buffer = win32file.AllocateReadBuffer(size)
+                win32file.ReadFile(self.hComPort, buffer, ol)
+                r = win32event.WaitForSingleObject(ol.hEvent, timeout)
+
+                if r == win32event.WAIT_TIMEOUT:
+                    win32file.CancelIo(self.hComPort)
+
+                if r == win32event.WAIT_TIMEOUT or \
+                   r == win32event.WAIT_ABANDONED or \
+                   r == win32event.WAIT_FAILED:
+                    win32file.CloseHandle(ol.hEvent)
+                    return (None, None, None)
+
+                num_bytes = win32file.GetOverlappedResult(self.hComPort, ol, True)
+                data = bytes(buffer[0:num_bytes])
+                win32file.CloseHandle(ol.hEvent)
+            else:
+                data = os.read(self.fd, size)
+        else:
+            if os.name == 'nt':
+                ol = win32file.OVERLAPPED()
+                buffer = win32file.AllocateReadBuffer(size)
+                win32file.ReadFile(self.hComPort, buffer, ol)
+
+                num_bytes = win32file.GetOverlappedResult(self.hComPort, ol, True)
+                data = bytes(buffer[0:num_bytes])
+            else:
+                data = os.read(self.fd, size)
+
+        return self.__parse_output(data)
 
     def write(self, data):
         if os.name == 'nt':
@@ -738,6 +754,6 @@ if __name__ == '__main__':
     p.purge()
 
     p.write(b'U')
-    print(p.read())
+    print(p.read(100))
 
     p.close()
