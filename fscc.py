@@ -94,7 +94,7 @@ class Port(object):
         editable_register_names = [r for r in register_names if r not in
                                    ['STAR', 'VSTR']]
 
-        def __init__(self, port=None):
+        def __init__(self, port):
             self.port = port
             self._clear_registers()
 
@@ -127,22 +127,17 @@ class Port(object):
 
         def _get_register(self, register):
             """Gets the value of a register."""
-            if self.port:
-                self._clear_registers()
-                setattr(self, '_%s' % register, FSCC_UPDATE_VALUE)
-                self._get_registers()
+            self._clear_registers()
+            setattr(self, '_%s' % register, FSCC_UPDATE_VALUE)
+            self._get_registers()
 
             return getattr(self, '_%s' % register)
 
         def _set_register(self, register, value):
             """Sets the value of a register."""
-            if self.port:
-                self._clear_registers()
-
+            self._clear_registers()
             setattr(self, '_%s' % register, value)
-
-            if self.port:
-                self._set_registers()
+            self._set_registers()
 
         def _clear_registers(self):
             """Clears the stored register values."""
@@ -151,9 +146,6 @@ class Port(object):
 
         def _get_registers(self):
             """Gets all of the register values."""
-            if not self.port:
-                return
-
             registers = list(self)
 
             fmt = 'q' * len(registers)
@@ -166,9 +158,6 @@ class Port(object):
 
         def _set_registers(self):
             """Sets all of the register values."""
-            if not self.port:
-                return
-
             registers = list(self)
 
             fmt = 'q' * len(registers)
