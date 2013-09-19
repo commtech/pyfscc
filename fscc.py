@@ -20,7 +20,6 @@
 
 import struct
 import select
-import errno
 import os
 import ctypes
 import sys
@@ -32,24 +31,22 @@ try:
         lib = ctypes.cdll.LoadLibrary('./libcfscc.so')
 except:
     if os.name == 'nt':
-        lib = ctypes.cdll.LoadLibrary(os.path.join(sys.prefix, 'DLLs\cfscc.dll'))
+        lib = ctypes.cdll.LoadLibrary(os.path.join(sys.prefix,
+                                                   'DLLs\cfscc.dll'))
     else:
-        lib = ctypes.cdll.LoadLibrary(os.path.join(sys.prefix, 'local/DLLs/libcfscc.so'))
+        lib = ctypes.cdll.LoadLibrary(os.path.join(sys.prefix,
+                                                   'local/DLLs/libcfscc.so'))
 
-if os.name == 'nt':
-    import win32file
-    import win32event
-else:
-    import fcntl
 
 FSCC_UPDATE_VALUE = -2
 
 XF, XREP, TXT, TXEXT = 0, 1, 2, 4
-FSCC_TIMEOUT, FSCC_INCORRECT_MODE, FSCC_BUFFER_TOO_SMALL, FSCC_PORT_NOT_FOUND = 16000, 16001, 16002, 16003
+FSCC_TIMEOUT, FSCC_INCORRECT_MODE, \
+    FSCC_BUFFER_TOO_SMALL, FSCC_PORT_NOT_FOUND = 16000, 16001, 16002, 16003
 
 NOT_SUPPORTED_TEXT = 'This feature isn\'t supported on this port.'
 
-    
+
 class PortNotFoundError(Exception):
     def __init__(self, port_num):
         self.port_num = port_num
@@ -160,7 +157,8 @@ class Port(object):
             registers = list(self)
 
             fmt = 'q' * len(registers)
-            regs = self.port._ctypes_get_struct(lib.fscc_get_registers, fmt, registers)
+            regs = self.port._ctypes_get_struct(lib.fscc_get_registers, fmt,
+                                                registers)
 
             for i, register in enumerate(registers):
                 if register != -1:
@@ -235,7 +233,6 @@ class Port(object):
                 if value >= 0:
                     export_file.write('%s = 0x%08x\n' % (register_name, value))
 
-
     class MemoryCap(object):
 
         def __init__(self, port=None):
@@ -249,7 +246,8 @@ class Port(object):
 
         def _get_memcap(self):
             """Gets the value of the memory cap setting."""
-            return self.port._ctypes_get_struct(lib.fscc_get_memory_cap, 'i' * 2, (-1, -1))
+            return self.port._ctypes_get_struct(lib.fscc_get_memory_cap,
+                                                'i' * 2, (-1, -1))
 
         def _set_imemcap(self, memcap):
             """Sets the value of the input memory cap setting."""
@@ -270,7 +268,6 @@ class Port(object):
             return self._get_memcap()[1]
 
         output = property(fset=_set_omemcap, fget=_get_omemcap)
-
 
     def __init__(self, port_num, append_status=True, append_timestamp=True):
         self._handle = ctypes.c_void_p()
@@ -305,7 +302,7 @@ class Port(object):
 
     def _set_append_status(self, status):
         """Sets the value of the append status setting."""
-        return self._ctypes_set_bool(lib.fscc_enable_append_status, 
+        return self._ctypes_set_bool(lib.fscc_enable_append_status,
                                      lib.fscc_disable_append_status,
                                      status)
 
@@ -317,7 +314,7 @@ class Port(object):
 
     def _set_append_timestamp(self, status):
         """Sets the value of the append timestamp setting."""
-        return self._ctypes_set_bool(lib.fscc_enable_append_timestamp, 
+        return self._ctypes_set_bool(lib.fscc_enable_append_timestamp,
                                      lib.fscc_disable_append_timestamp,
                                      status)
 
@@ -330,7 +327,7 @@ class Port(object):
 
     def _set_ignore_timeout(self, status):
         """Sets the value of the ignore timeout setting."""
-        return self._ctypes_set_bool(lib.fscc_enable_ignore_timeout, 
+        return self._ctypes_set_bool(lib.fscc_enable_ignore_timeout,
                                      lib.fscc_disable_ignore_timeout,
                                      status)
 
@@ -354,7 +351,7 @@ class Port(object):
     def _set_rx_multiple(self, status):
         """Sets the value of the rx multiple setting."""
         return self._ctypes_set_bool(lib.fscc_enable_rx_multiple,
-                                     lib.fscc_disable_rx_multiple, 
+                                     lib.fscc_disable_rx_multiple,
                                      status)
 
     def _get_rx_multiple(self):
@@ -368,16 +365,16 @@ class Port(object):
         lib.fscc_set_clock_frequency(self._handle, frequency)
 
     clock_frequency = property(fset=_set_clock_frequency)
-    
+
     def _ctypes_set_bool(self, enable_func, disable_func, status):
         if status:
             enable_func(self._handle)
         else:
             disable_func(self._handle)
-    
+
     def _ctypes_get_bool(self, func):
         return True if self._ctypes_get_uint(func) else False
-    
+
     def _ctypes_get_uint(self, func):
         status = ctypes.c_uint()
         func(self._handle, ctypes.byref(status))
@@ -434,29 +431,32 @@ class Port(object):
         data = bytes(size)
 
         if timeout:
-            e = lib.fscc_read_with_timeout(self._handle, data, size, ctypes.byref(bytes_read), timeout)
+            e = lib.fscc_read_with_timeout(self._handle, data, size,
+                                           ctypes.byref(bytes_read), timeout)
 
             if e == 0 or e == 997:
                 pass
             elif e == FSCC_BUFFER_TOO_SMALL:
                 raise BufferTooSmallError()
             else:
-                raise Exception(e)            
+                raise Exception(e)
         else:
-            e = lib.fscc_read_with_blocking(self._handle, data, size, ctypes.byref(bytes_read), timeout)
+            e = lib.fscc_read_with_blocking(self._handle, data, size,
+                                            ctypes.byref(bytes_read), timeout)
 
             if e == 0:
                 pass
             elif e == FSCC_BUFFER_TOO_SMALL:
                 raise BufferTooSmallError()
             else:
-                raise Exception(e)       
+                raise Exception(e)
 
         return self.__parse_output(data[:bytes_read.value])
 
     def write(self, data):
         bytes_written = ctypes.c_uint()
-        e = lib.fscc_write_with_blocking(self._handle, data, len(data), ctypes.byref(bytes_written))
+        e = lib.fscc_write_with_blocking(self._handle, data, len(data),
+                                         ctypes.byref(bytes_written))
 
         if e == 0:
             pass
