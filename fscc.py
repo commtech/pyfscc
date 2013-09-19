@@ -395,7 +395,7 @@ class Port(object):
         _append_status = self.append_status
         _append_timestamp = self.append_timestamp
 
-        status, timestamp, data = None, None, None
+        status, timestamp, data = None, None, packet
 
         if os.name == 'nt':
             if (_append_status and _append_timestamp):
