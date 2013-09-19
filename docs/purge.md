@@ -21,6 +21,11 @@ def purge(self, tx=True, rx=True)
 | `tx`      | `Boolean` | True    | Whether to purge the transmit data
 | `rx`      | `Boolean` | True    | Whether to purge the receive data
 
+| Exception           | Cause
+| ------------------- | --------------------------------------------------------------------
+| TimeoutError        | You are executing a command that requires a transmit clock present
+| BufferTooSmallError | The read size is smaller than the next frame (in a frame based mode)
+
 ###### Examples
 Purge both the transmit and receive data.
 ```python

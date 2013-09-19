@@ -38,6 +38,10 @@ def read(self, timeout=None, size=4096):
 | `timeout`    | `int` | None    | Number of milliseconds to wait for data before timing out
 | `size`       | `int` | 4096    | The data buffer size
 
+| Exception           | Cause
+| ------------------- | --------------------------------------------------------------------
+| BufferTooSmallError | The read size is smaller than the next frame (in a frame based mode)
+
 ###### Examples
 ```python
 import fscc
