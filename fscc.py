@@ -274,7 +274,16 @@ class Port(object):
 
     def __init__(self, port_num, append_status=True, append_timestamp=True):
         self._handle = ctypes.c_void_p()
-        lib.fscc_connect(port_num, ctypes.byref(self._handle))
+
+        e = lib.fscc_connect(port_num, ctypes.byref(self._handle))
+
+        if e == 0:
+            pass
+        elif e == FSCC_PORT_NOT_FOUND:
+            raise PortNotFoundError()
+        else:
+            raise Exception(e)
+
         self._handle = self._handle.value
 
         self.registers = Port.Registers(self)
