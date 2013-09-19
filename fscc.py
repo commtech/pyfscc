@@ -467,7 +467,7 @@ class Port(object):
         else:
             raise Exception(e)
 
-        return bytes_written
+        return bytes_written.value
 
     def close(self):
         lib.fscc_disconnect(self._handle)
