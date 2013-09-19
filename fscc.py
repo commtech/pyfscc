@@ -465,33 +465,6 @@ class Port(object):
     def close(self):
         lib.fscc_disconnect(self._handle)
 
-    def can_read(self, timeout=100):
-        """Checks whether there is data available to read."""
-        poll_obj = select.poll()
-        poll_obj.register(self, select.POLLIN)
-
-        poll_data = poll_obj.poll(timeout)
-
-        poll_obj.unregister(self)
-
-        if poll_data and (poll_data[0][1] | select.POLLIN):
-            return True
-        else:
-            return False
-
-    def can_write(self, timeout=100):
-        """Checks whether there is room available to write additional data."""
-        poll_obj = select.poll()
-        poll_obj.register(self, select.POLLOUT)
-
-        poll_data = poll_obj.poll(timeout)
-
-        poll_obj.unregister(self)
-
-        if poll_data and (poll_data[0][1] | select.POLLOUT):
-            return True
-        else:
-            return False
 
 if __name__ == '__main__':
     p = Port(0)
