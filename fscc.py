@@ -427,7 +427,7 @@ class Port(object):
             e = lib.fscc_read_with_timeout(self._handle, data, size,
                                            ctypes.byref(bytes_read), timeout)
 
-            if e == 0 or e == 997:
+            if e == 0:
                 pass
             elif e == FSCC_BUFFER_TOO_SMALL:
                 raise BufferTooSmallError()
