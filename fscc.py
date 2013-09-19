@@ -277,7 +277,7 @@ class Port(object):
         if e == 0:
             pass
         elif e == FSCC_PORT_NOT_FOUND:
-            raise PortNotFoundError()
+            raise PortNotFoundError(port_num)
         else:
             raise Exception(e)
 
