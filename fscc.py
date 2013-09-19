@@ -420,10 +420,6 @@ class Port(object):
         data = bytes(size)
 
         if timeout:
-            #TODO
-            if os.name != 'nt':
-                raise NotImplementedError()
-
             e = lib.fscc_read_with_timeout(self._handle, data, size,
                                            ctypes.byref(bytes_read), timeout)
 
