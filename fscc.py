@@ -442,7 +442,7 @@ class Port(object):
                 raise Exception(e)
         else:
             e = lib.fscc_read_with_blocking(self._handle, data, size,
-                                            ctypes.byref(bytes_read), timeout)
+                                            ctypes.byref(bytes_read))
 
             if e == 0:
                 pass
