@@ -42,7 +42,9 @@ FSCC_UPDATE_VALUE = -2
 
 XF, XREP, TXT, TXEXT = 0, 1, 2, 4
 FSCC_TIMEOUT, FSCC_INCORRECT_MODE, \
-    FSCC_BUFFER_TOO_SMALL, FSCC_PORT_NOT_FOUND = 16000, 16001, 16002, 16003
+    FSCC_BUFFER_TOO_SMALL, \
+    FSCC_PORT_NOT_FOUND, \
+    FSCC_INVALID_ACCESS = 16000, 16001, 16002, 16003, 16004
 
 NOT_SUPPORTED_TEXT = 'This feature isn\'t supported on this port.'
 
@@ -267,6 +269,8 @@ class Port(object):
             pass
         elif e == FSCC_PORT_NOT_FOUND:
             raise PortNotFoundError(port_num)
+        elif e == FSCC_INVALID_ACCESS:
+            raise PermissionError('Can\'t access port')
         else:
             raise Exception(e)
 
