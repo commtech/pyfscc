@@ -22,10 +22,10 @@ def write(self, data):
 | ---------------------------
 | Number of bytes transmitted
 
-| Exception           | Cause
-| ------------------- | --------------------------------------------------------------------
-| TimeoutError        | You are executing a command that requires a transmit clock present
-| BufferTooSmallError | The read size is smaller than the next frame (in a frame based mode)
+| Exception           | Base Exception | Cause
+| ------------------- | -------------- | --------------------------------------------------
+| BufferTooSmallError | OSError        | The write size exceeds the output memory usage cap
+| TimeoutError        | OSError        | Command timed out (missing clock)
 
 ###### Examples
 ```c
