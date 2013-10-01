@@ -49,14 +49,6 @@ FSCC_TIMEOUT, FSCC_INCORRECT_MODE, \
 NOT_SUPPORTED_TEXT = 'This feature isn\'t supported on this port.'
 
 
-class PortNotFoundError(Exception):
-    def __init__(self, port_num):
-        self.port_num = port_num
-
-    def __str__(self):
-        return 'Port not found'
-
-
 class TimeoutError(Exception):
     def __str__(self):
         return 'Port timed out'
@@ -268,9 +260,9 @@ class Port(object):
         if e == 0:
             pass
         elif e == FSCC_PORT_NOT_FOUND:
-            raise PortNotFoundError(port_num)
+            raise FileNotFoundError('Port not found')
         elif e == FSCC_INVALID_ACCESS:
-            raise PermissionError('Can\'t access port')
+            raise PermissionError('Invalid access')
         else:
             raise OSError(e)
 
