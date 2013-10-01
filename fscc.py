@@ -60,12 +60,12 @@ class InvalidAccessError(PermissionError):
         super(InvalidAccessError, self).__init__('Invalid access')
 
 
-class TimeoutError(Exception):
+class TimeoutError(OSError):
     def __str__(self):
         return 'Port timed out'
 
 
-class BufferTooSmallError(Exception):
+class BufferTooSmallError(OSError):
     def __str__(self):
         return 'Buffer too small'
 
