@@ -42,7 +42,9 @@ FSCC_UPDATE_VALUE = -2
 
 XF, XREP, TXT, TXEXT = 0, 1, 2, 4
 FSCC_TIMEOUT, FSCC_INCORRECT_MODE, \
-    FSCC_BUFFER_TOO_SMALL, FSCC_PORT_NOT_FOUND = 16000, 16001, 16002, 16003
+    FSCC_BUFFER_TOO_SMALL, \
+    FSCC_PORT_NOT_FOUND, \
+    FSCC_INVALID_ACCESS = 16000, 16001, 16002, 16003, 16004
 
 NOT_SUPPORTED_TEXT = 'This feature isn\'t supported on this port.'
 
@@ -169,7 +171,7 @@ class Port(object):
             elif e == FSCC_TIMEOUT:
                 raise TimeoutError()
             else:
-                raise Exception(e)
+                raise OSError(e)
 
         def _set_register_by_index(self, index, value):
             """Sets the value of a register by it's index."""
@@ -267,8 +269,10 @@ class Port(object):
             pass
         elif e == FSCC_PORT_NOT_FOUND:
             raise PortNotFoundError(port_num)
+        elif e == FSCC_INVALID_ACCESS:
+            raise PermissionError('Can\'t access port')
         else:
-            raise Exception(e)
+            raise OSError(e)
 
         self._handle = self._handle.value
 
@@ -287,7 +291,7 @@ class Port(object):
         elif e == FSCC_TIMEOUT:
             raise TimeoutError()
         else:
-            raise Exception(e)
+            raise OSError(e)
 
     def _set_append_status(self, status):
         """Sets the value of the append status setting."""
@@ -428,7 +432,7 @@ class Port(object):
             elif e == FSCC_BUFFER_TOO_SMALL:
                 raise BufferTooSmallError()
             else:
-                raise Exception(e)
+                raise OSError(e)
         else:
             e = lib.fscc_read_with_blocking(self._handle, data, size,
                                             ctypes.byref(bytes_read))
@@ -438,7 +442,7 @@ class Port(object):
             elif e == FSCC_BUFFER_TOO_SMALL:
                 raise BufferTooSmallError()
             else:
-                raise Exception(e)
+                raise OSError(e)
 
         return self.__parse_output(data[:bytes_read.value])
 
@@ -454,7 +458,7 @@ class Port(object):
         elif e == FSCC_TIMEOUT:
             raise TimeoutError()
         else:
-            raise Exception(e)
+            raise OSError(e)
 
         return bytes_written.value
 
