@@ -70,21 +70,6 @@ class BufferTooSmallError(OSError):
         return 'Buffer too small'
 
 
-class InvalidRegisterError(Exception):
-    """Exception for the situation where an invalid register is modified."""
-    def __init__(self, register_name):
-        self.register_name = register_name
-
-    def __str__(self):
-        return "'%s' is an invalid register" % self.register_name
-
-
-class ReadonlyRegisterError(InvalidRegisterError):
-    """Exception for the situation where a read only register is modified."""
-    def __str__(self):
-        return "'%s' is a readonly register" % self.register_name
-
-
 class Port(object):
     """Commtech FSCC port."""
     class Registers(object):
@@ -203,18 +188,13 @@ class Port(object):
                     d = line.split('=')
                     reg_name, reg_val = d[0].strip().upper(), d[1].strip()
 
-                    if reg_name not in self.register_names:
-                        raise InvalidRegisterError(reg_name)
+                    if reg_name in self.editable_register_names:
+                        if reg_val[0] == '0' and reg_val[1] in ['x', 'X']:
+                            reg_val = int(reg_val, 16)
+                        else:
+                            reg_val = int(reg_val)
 
-                    if reg_name not in self.editable_register_names:
-                        raise ReadonlyRegisterError(reg_name)
-
-                    if reg_val[0] == '0' and reg_val[1] in ['x', 'X']:
-                        reg_val = int(reg_val, 16)
-                    else:
-                        reg_val = int(reg_val)
-
-                    setattr(self, reg_name, reg_val)
+                        setattr(self, reg_name, reg_val)
 
         def export_to_file(self, export_file):
             """Writes the current register values to a file."""
