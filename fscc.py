@@ -62,7 +62,7 @@ class InvalidAccessError(PermissionError):
 
 class TimeoutError(OSError):
     def __str__(self):
-        return 'Port timed out'
+        return 'Command timed out (missing clock)'
 
 
 class BufferTooSmallError(OSError):
