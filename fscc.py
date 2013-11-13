@@ -394,19 +394,34 @@ class Port(object):
             if timestamp:
                 timestamp = timestamp / 10000000 - 11644473600
         else:
-            if (_append_status and _append_timestamp):
-                status = packet[-18:-16]
-                timestamp = struct.unpack('ll', packet[-16:])
-                data = packet[:-18]
-            elif (_append_status):
-                status = packet[-2:]
-                data = packet[:-2]
-            elif (_append_timestamp):
-                timestamp = struct.unpack('ll', packet[-16:])
-                data = packet[:-16]
+            if ctypes.sizeof(ctypes.c_voidp) == 4:
+                if (_append_status and _append_timestamp):
+                    status = packet[-10:-8]
+                    timestamp = struct.unpack('ll', packet[-8:])
+                    data = packet[:-10]
+                elif (_append_status):
+                    status = packet[-2:]
+                    data = packet[:-2]
+                elif (_append_timestamp):
+                    timestamp = struct.unpack('ll', packet[-8:])
+                    data = packet[:-8]
 
-            if timestamp:
-                timestamp = timestamp[0] + (float(timestamp[1]) / 1000000)
+                if timestamp:
+                    timestamp = timestamp[0] + (float(timestamp[1]) / 1000000)
+            else:
+                if (_append_status and _append_timestamp):
+                    status = packet[-18:-16]
+                    timestamp = struct.unpack('ll', packet[-16:])
+                    data = packet[:-18]
+                elif (_append_status):
+                    status = packet[-2:]
+                    data = packet[:-2]
+                elif (_append_timestamp):
+                    timestamp = struct.unpack('ll', packet[-16:])
+                    data = packet[:-16]
+
+                if timestamp:
+                    timestamp = timestamp[0] + (float(timestamp[1]) / 1000000)
 
         return (data, status, timestamp)
 
