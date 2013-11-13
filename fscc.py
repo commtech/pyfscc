@@ -70,6 +70,11 @@ class BufferTooSmallError(OSError):
         return 'Buffer too small'
 
 
+class IncorrectModeError(OSError):
+    def __str__(self):
+        return 'Incorrect mode'
+
+
 class Port(object):
     """Commtech FSCC port."""
     class Registers(object):
@@ -409,23 +414,18 @@ class Port(object):
         if timeout:
             e = lib.fscc_read_with_timeout(self._handle, data, size,
                                            ctypes.byref(bytes_read), timeout)
-
-            if e == 0:
-                pass
-            elif e == FSCC_BUFFER_TOO_SMALL:
-                raise BufferTooSmallError()
-            else:
-                raise OSError(e)
         else:
             e = lib.fscc_read_with_blocking(self._handle, data, size,
                                             ctypes.byref(bytes_read))
 
-            if e == 0:
-                pass
-            elif e == FSCC_BUFFER_TOO_SMALL:
-                raise BufferTooSmallError()
-            else:
-                raise OSError(e)
+        if e == 0:
+            pass
+        elif e == FSCC_BUFFER_TOO_SMALL:
+            raise BufferTooSmallError()
+        elif e == FSCC_INCORRECT_MODE:
+            raise IncorrectModeError()
+        else:
+            raise OSError(e)
 
         return self.__parse_output(data[:bytes_read.value])
 
@@ -440,6 +440,8 @@ class Port(object):
             raise BufferTooSmallError()
         elif e == FSCC_TIMEOUT:
             raise TimeoutError()
+        elif e == FSCC_INCORRECT_MODE:
+            raise IncorrectModeError()
         else:
             raise OSError(e)
 
