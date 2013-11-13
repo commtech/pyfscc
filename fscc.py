@@ -23,18 +23,23 @@ import os
 import ctypes
 import sys
 
-try:
-    if os.name == 'nt':
-        lib = ctypes.cdll.LoadLibrary('cfscc.dll')
+if os.name == 'nt':
+    DLL_NAME = 'cfscc.dll'
+else:
+    if ctypes.sizeof(ctypes.c_voidp) == 4:
+        DLL_NAME = 'libcfscc.so'
     else:
-        lib = ctypes.cdll.LoadLibrary('./libcfscc.so')
+        DLL_NAME = 'libcfscc.so.6'
+
+try:
+    lib = ctypes.cdll.LoadLibrary(DLL_NAME)
 except:
     if os.name == 'nt':
-        lib = ctypes.cdll.LoadLibrary(os.path.join(sys.prefix,
-                                                   'DLLs\cfscc.dll'))
+        lib = ctypes.cdll.LoadLibrary(os.path.join(sys.prefix, 'DLLS',
+                                                   DLL_NAME))
     else:
-        lib = ctypes.cdll.LoadLibrary(os.path.join(sys.prefix,
-                                                   'local/DLLs/libcfscc.so'))
+        lib = ctypes.cdll.LoadLibrary(os.path.join(sys.prefix, 'local', 'DLLs',
+                                                   DLL_NAME))
 
 
 FSCC_UPDATE_VALUE = -2
