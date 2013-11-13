@@ -17,10 +17,10 @@ if you would like to use the asynchronous functionality.
 def __init__(self, port_num, append_status=True, append_timestamp=True)
 ```
 
-| Exception          | Base Exception    | Cause
-| ------------------ | ----------------- |-------------------------
-| PortNotFoundError  | FileNotFoundError | Port not found
-| InvalidAccessError | PermissionError   | Insufficient permissions
+| Exception          | Base Exception | Cause
+| ------------------ | -------------- |-------------------------
+| PortNotFoundError  | OSError        | Port not found
+| InvalidAccessError | OSError        | Insufficient permissions
 
 ###### Examples
 ```python
