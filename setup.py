@@ -6,7 +6,7 @@ if os.name == 'nt':
     data_files=[('DLLs', ['cfscc.dll'])]
 else:
     requirements = ['serial']
-    data_files=[('DLLs', ['libcfscc.so'])]
+    data_files=[('DLLs', ['libcfscc.so', 'libcfscc.so.6'])]
 
 setup(name='pyfscc',
       version='1.0.0',
