@@ -19,7 +19,6 @@
 """
 
 import struct
-import select
 import os
 import ctypes
 import sys
