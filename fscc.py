@@ -470,6 +470,17 @@ class Port(object):
     def close(self):
         lib.fscc_disconnect(self._handle)
 
+    def __str__(self):
+        if os.name == 'nt':
+            return 'FSCC{}'.format(self._port_num)
+        else:
+            return '/dev/fscc{}'.format(self._port_num)
+
+    def __repr__(self):
+        return 'fscc.Port({}, {}, {})'.format(self._port_num,
+                                              self.append_status,
+                                              self.append_timestamp)
+
 
 if __name__ == '__main__':
     p = Port(0)
