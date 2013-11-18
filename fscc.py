@@ -267,6 +267,7 @@ class Port(object):
             raise OSError(e)
 
         self._handle = self._handle.value
+        self._port_num = port_num
 
         self.registers = Port.Registers(self)
         self.memory_cap = Port.MemoryCap(self)
