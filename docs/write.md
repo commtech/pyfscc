@@ -22,11 +22,11 @@ def write(self, data):
 | ---------------------------
 | Number of bytes transmitted
 
-| Exception           | Base Exception | Cause
-| ------------------- | -------------- | ----------------------------------------------------
-| BufferTooSmallError | OSError        | The write size exceeds the output memory usage cap
-| TimeoutError        | OSError        | Command timed out (missing clock)
-| IncorrectModeError  | OSError        | Using the /dev/fsccX node while in asynchronous mode
+| Exception             | Base Exception | Cause
+| --------------------- | -------------- | ----------------------------------------------------
+| `BufferTooSmallError` | `OSError`      | The write size exceeds the output memory usage cap
+| `TimeoutError`        | `OSError`      | Command timed out (missing clock)
+| `IncorrectModeError`  | `OSError`      | Using the /dev/fsccX node while in asynchronous mode
 
 ###### Examples
 ```c

@@ -21,9 +21,9 @@ def purge(self, tx=True, rx=True)
 | `tx`      | `Boolean` | True    | Whether to purge the transmit data
 | `rx`      | `Boolean` | True    | Whether to purge the receive data
 
-| Exception    | Base Exception | Cause
-| ------------ | -------------- | ---------------------------------
-| TimeoutError | OSError        | Command timed out (missing clock)
+| Exception      | Base Exception | Cause
+| -------------- | -------------- | ---------------------------------
+| `TimeoutError` | `OSError`      | Command timed out (missing clock)
 
 ###### Examples
 Purge both the transmit and receive data.
