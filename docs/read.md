@@ -39,8 +39,9 @@ def read(self, timeout=None, size=4096):
 | `size`       | `int` | 4096    | The data buffer size
 
 | Exception           | Base Exception | Cause
-| ------------------- | -------------- | ----------------------------------------------
+| ------------------- | -------------- | ----------------------------------------------------
 | BufferTooSmallError | OSError        | The buffer size is smaller than the next frame
+| IncorrectModeError  | OSError        | Using the /dev/fsccX node while in asynchronous mode
 
 ###### Examples
 ```python
