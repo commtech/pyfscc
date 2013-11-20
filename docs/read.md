@@ -38,9 +38,10 @@ def read(self, timeout=None, size=4096):
 | `timeout`    | `int` | None    | Number of milliseconds to wait for data before timing out
 | `size`       | `int` | 4096    | The data buffer size
 
-| Exception           | Base Exception | Cause
-| ------------------- | -------------- | ----------------------------------------------
-| BufferTooSmallError | OSError        | The buffer size is smaller than the next frame
+| Exception             | Base Exception | Cause
+| --------------------- | -------------- | ----------------------------------------------------
+| `BufferTooSmallError` | `OSError`      | The buffer size is smaller than the next frame
+| `IncorrectModeError`  | `OSError`      | Using the synchronous port while in asynchronous mode
 
 ###### Examples
 ```python

@@ -22,10 +22,11 @@ def write(self, data):
 | ---------------------------
 | Number of bytes transmitted
 
-| Exception           | Base Exception | Cause
-| ------------------- | -------------- | --------------------------------------------------
-| BufferTooSmallError | OSError        | The write size exceeds the output memory usage cap
-| TimeoutError        | OSError        | Command timed out (missing clock)
+| Exception             | Base Exception | Cause
+| --------------------- | -------------- | ----------------------------------------------------
+| `BufferTooSmallError` | `OSError`      | The write size exceeds the output memory usage cap
+| `TimeoutError`        | `OSError`      | Command timed out (missing clock)
+| `IncorrectModeError`  | `OSError`      | Using the synchronous port while in asynchronous mode
 
 ###### Examples
 ```c

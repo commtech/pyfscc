@@ -267,6 +267,7 @@ class Port(object):
             raise OSError(e)
 
         self._handle = self._handle.value
+        self._port_num = port_num
 
         self.registers = Port.Registers(self)
         self.memory_cap = Port.MemoryCap(self)
@@ -468,6 +469,17 @@ class Port(object):
 
     def close(self):
         lib.fscc_disconnect(self._handle)
+
+    def __str__(self):
+        if os.name == 'nt':
+            return 'FSCC{}'.format(self._port_num)
+        else:
+            return '/dev/fscc{}'.format(self._port_num)
+
+    def __repr__(self):
+        return 'fscc.Port({}, {}, {})'.format(self._port_num,
+                                              self.append_status,
+                                              self.append_timestamp)
 
 
 if __name__ == '__main__':

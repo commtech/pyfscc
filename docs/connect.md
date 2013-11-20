@@ -17,10 +17,10 @@ if you would like to use the asynchronous functionality.
 def __init__(self, port_num, append_status=True, append_timestamp=True)
 ```
 
-| Exception          | Base Exception | Cause
-| ------------------ | -------------- |-------------------------
-| PortNotFoundError  | OSError        | Port not found
-| InvalidAccessError | OSError        | Insufficient permissions
+| Exception            | Base Exception | Cause
+| -------------------- | -------------- |-------------------------
+| `PortNotFoundError`  | `OSError`      | Port not found
+| `InvalidAccessError` | `OSError`      | Insufficient permissions
 
 ###### Examples
 ```python
@@ -33,4 +33,4 @@ p = fscc.Port(0)
 
 ### Additional Resources
 - Complete example: [`examples\tutorial.py`](https://github.com/commtech/pyfscc/blob/master/examples/tutorial.py)
-- Implemenation details: [`fscc.py`](https://github.com/commtech/pyfscc/blob/master/scc.py)
+- Implemenation details: [`fscc.py`](https://github.com/commtech/pyfscc/blob/master/fscc.py)
