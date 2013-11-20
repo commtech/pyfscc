@@ -41,7 +41,7 @@ def read(self, timeout=None, size=4096):
 | Exception             | Base Exception | Cause
 | --------------------- | -------------- | ----------------------------------------------------
 | `BufferTooSmallError` | `OSError`      | The buffer size is smaller than the next frame
-| `IncorrectModeError`  | `OSError`      | Using the /dev/fsccX node while in asynchronous mode
+| `IncorrectModeError`  | `OSError`      | Using the synchronous port while in asynchronous mode
 
 ###### Examples
 ```python

@@ -26,7 +26,7 @@ def write(self, data):
 | --------------------- | -------------- | ----------------------------------------------------
 | `BufferTooSmallError` | `OSError`      | The write size exceeds the output memory usage cap
 | `TimeoutError`        | `OSError`      | Command timed out (missing clock)
-| `IncorrectModeError`  | `OSError`      | Using the /dev/fsccX node while in asynchronous mode
+| `IncorrectModeError`  | `OSError`      | Using the synchronous port while in asynchronous mode
 
 ###### Examples
 ```c
