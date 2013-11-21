@@ -435,12 +435,13 @@ class Port(object):
 
         data, status, timestamp = packet, None, None
 
-        if os.name == 'nt':
-            data, status, timestamp = Port.__parse_output_windows(
-                _append_status, _append_timestamp, packet)
-        else:
-            data, status, timestamp = Port.__parse_output_linux(
-                _append_status, _append_timestamp, packet)
+        if not self.rx_multiple:
+            if os.name == 'nt':
+                data, status, timestamp = Port.__parse_output_windows(
+                    _append_status, _append_timestamp, packet)
+            else:
+                data, status, timestamp = Port.__parse_output_linux(
+                    _append_status, _append_timestamp, packet)
 
         return (data, status, timestamp)
 
