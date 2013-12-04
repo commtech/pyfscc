@@ -37,7 +37,7 @@ modifiers = p.tx_modifiers
 import fscc
 ...
 
-p.tx_modifiers = XF | XREP
+p.tx_modifiers = TXT | XREP
 ```
 
 

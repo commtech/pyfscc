@@ -272,8 +272,11 @@ class Port(object):
         self.registers = Port.Registers(self)
         self.memory_cap = Port.MemoryCap(self)
 
-        self.append_status = append_status
-        self.append_timestamp = append_timestamp
+        if append_status is not None:
+            self.append_status = append_status
+
+        if append_timestamp is not None:
+            self.append_timestamp = append_timestamp
 
     def purge(self, tx=True, rx=True):
         """Removes unsent and/or unread data from the card."""
