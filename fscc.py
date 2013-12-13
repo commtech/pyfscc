@@ -394,54 +394,77 @@ class Port(object):
         if not packet:
             return (None, None, None)
 
-        _append_status = self.append_status
-        _append_timestamp = self.append_timestamp
+    @staticmethod
+    def __parse_output_windows(append_status, append_timestamp, packet):
+        status, timestamp = None, None
 
-        status, timestamp, data = None, None, packet
+        if (append_status and append_timestamp):
+            status = packet[-10:-8]
+            timestamp = struct.unpack('q', packet[-8:])[0]
+            data = packet[:-10]
+        elif (append_status):
+            status = packet[-2:]
+            data = packet[:-2]
+        elif (append_timestamp):
+            timestamp = struct.unpack('q', packet[-8:])[0]
+            data = packet[:-8]
 
-        if os.name == 'nt':
-            if (_append_status and _append_timestamp):
+        if timestamp:
+            timestamp = timestamp / 10000000 - 11644473600
+
+        return (data, status, timestamp)
+
+    @staticmethod
+    def __parse_output_linux(append_status, append_timestamp, packet):
+        status, timestamp = None, None
+
+        if ctypes.sizeof(ctypes.c_voidp) == 4:
+            if (append_status and append_timestamp):
                 status = packet[-10:-8]
-                timestamp = struct.unpack('q', packet[-8:])[0]
+                timestamp = struct.unpack('ll', packet[-8:])
                 data = packet[:-10]
-            elif (_append_status):
+            elif (append_status):
                 status = packet[-2:]
                 data = packet[:-2]
-            elif (_append_timestamp):
-                timestamp = struct.unpack('q', packet[-8:])[0]
+            elif (append_timestamp):
+                timestamp = struct.unpack('ll', packet[-8:])
                 data = packet[:-8]
 
             if timestamp:
-                timestamp = timestamp / 10000000 - 11644473600
+                timestamp = timestamp[0] + (float(timestamp[1]) / 1000000)
         else:
-            if ctypes.sizeof(ctypes.c_voidp) == 4:
-                if (_append_status and _append_timestamp):
-                    status = packet[-10:-8]
-                    timestamp = struct.unpack('ll', packet[-8:])
-                    data = packet[:-10]
-                elif (_append_status):
-                    status = packet[-2:]
-                    data = packet[:-2]
-                elif (_append_timestamp):
-                    timestamp = struct.unpack('ll', packet[-8:])
-                    data = packet[:-8]
+            if (append_status and append_timestamp):
+                status = packet[-18:-16]
+                timestamp = struct.unpack('ll', packet[-16:])
+                data = packet[:-18]
+            elif (append_status):
+                status = packet[-2:]
+                data = packet[:-2]
+            elif (append_timestamp):
+                timestamp = struct.unpack('ll', packet[-16:])
+                data = packet[:-16]
 
-                if timestamp:
-                    timestamp = timestamp[0] + (float(timestamp[1]) / 1000000)
+            if timestamp:
+                timestamp = timestamp[0] + (float(timestamp[1]) / 1000000)
+
+        return (data, status, timestamp)
+
+    def __parse_output(self, packet):
+        if not packet:
+            return (None, None, None)
+
+        _append_status = self.append_status
+        _append_timestamp = self.append_timestamp
+
+        data, status, timestamp = packet, None, None
+
+        if not self.rx_multiple:
+            if os.name == 'nt':
+                data, status, timestamp = Port.__parse_output_windows(
+                    _append_status, _append_timestamp, packet)
             else:
-                if (_append_status and _append_timestamp):
-                    status = packet[-18:-16]
-                    timestamp = struct.unpack('ll', packet[-16:])
-                    data = packet[:-18]
-                elif (_append_status):
-                    status = packet[-2:]
-                    data = packet[:-2]
-                elif (_append_timestamp):
-                    timestamp = struct.unpack('ll', packet[-16:])
-                    data = packet[:-16]
-
-                if timestamp:
-                    timestamp = timestamp[0] + (float(timestamp[1]) / 1000000)
+                data, status, timestamp = Port.__parse_output_linux(
+                    _append_status, _append_timestamp, packet)
 
         return (data, status, timestamp)
 
