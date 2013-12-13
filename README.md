@@ -62,6 +62,7 @@ own program. All of these options are described on their respective documentatio
 - [Purge](https://github.com/commtech/pyfscc/blob/master/docs/purge.md)
 - [Registers](https://github.com/commtech/pyfscc/blob/master/docs/registers.md)
 - [TX Modifiers](https://github.com/commtech/pyfscc/blob/master/docs/tx-modifiers.md)
+- [Track Interrupts](https://github.com/commtech/pyfscc/blob/master/docs/track-interrupts.md)
 - [Writes](https://github.com/commtech/pyfscc/blob/master/docs/write.md)
 - [Read](https://github.com/commtech/pyfscc/blob/master/docs/read.md)
 

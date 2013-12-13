@@ -374,6 +374,22 @@ class Port(object):
         func(self._handle, buf)
         return struct.unpack(fmt, buf)
 
+    def track_interrupts(self, interrupts, timeout=None):
+        """Tracks interrupts."""
+        matches = ctypes.c_uint()
+
+        if timeout:
+            e = lib.fscc_track_interrupts_with_timeout(self._handle, interrupts,
+                                           ctypes.byref(matches), timeout)
+        else:
+            e = lib.fscc_track_interrupts_with_blocking(self._handle, interrupts,
+                                            ctypes.byref(matches))
+
+        if e != 0:
+            raise OSError(e)
+
+        return matches.value
+
     def __parse_output(self, packet):
         if not packet:
             return (None, None, None)
