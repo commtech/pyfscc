@@ -53,23 +53,11 @@ class SP_DEVINFO_DATA(ctypes.Structure):
         return "ClassGuid:%s DevInst:%s" % (self.ClassGuid, self.DevInst)
 
 
-def string(buffer):
-    s = []
-    for c in buffer:
-        if c == 0:
-            break
-        s.append(chr(c & 0xff))  # "& 0xff": hack to convert signed to unsigned
-    return ''.join(s)
-
-
 NULL = 0
 DIGCF_PRESENT = 2
 DICS_FLAG_GLOBAL = 1
 DIREG_DEV = 0x00000001
 KEY_READ = 0x20019
-SPDRP_FRIENDLYNAME = 12
-SPDRP_HARDWAREID = 1
-ERROR_INSUFFICIENT_BUFFER = 122
 
 setupapi = ctypes.windll.LoadLibrary("setupapi")
 advapi32 = ctypes.windll.LoadLibrary("Advapi32")
@@ -80,8 +68,6 @@ SetupDiGetClassDevs = setupapi.SetupDiGetClassDevsA
 SetupDiOpenDevRegKey = setupapi.SetupDiOpenDevRegKey
 RegCloseKey = advapi32.RegCloseKey
 RegQueryValueEx = advapi32.RegQueryValueExA
-#SetupDiGetDeviceInstanceId = setupapi.SetupDiGetDeviceInstanceIdA
-SetupDiGetDeviceRegistryProperty = setupapi.SetupDiGetDeviceRegistryPropertyA
 
 
 def fsccports():
@@ -108,59 +94,22 @@ def fsccports():
                                     DIREG_DEV,  # DIREG_DRV for SW info
                                     KEY_READ)
 
-        port_name_buffer = (BYTE * 4)()
-        port_name_length = ULONG(ctypes.sizeof(port_name_buffer))
+        port_num_buffer = (BYTE * 4)()
+        port_num_length = ULONG(ctypes.sizeof(port_num_buffer))
 
         RegQueryValueEx(hkey,
                         b'PortNumber',
                         None,
                         None,
-                        ctypes.byref(port_name_buffer),
-                        ctypes.byref(port_name_length))
+                        ctypes.byref(port_num_buffer),
+                        ctypes.byref(port_num_length))
 
         RegCloseKey(hkey)
 
-        bytes = array('B', port_name_buffer)
+        bytes = array('B', port_num_buffer)
         port_num = struct.unpack('I', bytes)[0]
-        port_name = 'FSCC{}'.format(port_num)
+        port_name = '\\\\.\\FSCC{}'.format(port_num)
 
-        # hardware ID
-        szHardwareID = (BYTE * 250)()
-        # try to get ID that includes serial number
-        #if not SetupDiGetDeviceInstanceId(
-        #        g_hdi,
-        #        ctypes.byref(devinfo),
-        #        ctypes.byref(szHardwareID),
-        #        ctypes.sizeof(szHardwareID) - 1,
-        #        None):
-        # fall back to more generic hardware ID if that would fail
-        if not SetupDiGetDeviceRegistryProperty(
-                g_hdi,
-                ctypes.byref(devinfo),
-                SPDRP_HARDWAREID,
-                None,
-                ctypes.byref(szHardwareID),
-                ctypes.sizeof(szHardwareID) - 1,
-                None):
-            # Ignore ERROR_INSUFFICIENT_BUFFER
-            if ctypes.GetLastError() != ERROR_INSUFFICIENT_BUFFER:
-                raise ctypes.WinError()
-        # stringify
-        szHardwareID_str = string(szHardwareID)
-
-        # friendly name
-        szFriendlyName = (BYTE * 250)()
-        if not SetupDiGetDeviceRegistryProperty(
-                g_hdi,
-                ctypes.byref(devinfo),
-                SPDRP_FRIENDLYNAME,
-                #~ SPDRP_DEVICEDESC,
-                None,
-                ctypes.byref(szFriendlyName),
-                ctypes.sizeof(szFriendlyName) - 1,
-                None):
-            yield port_name, 'n/a', szHardwareID_str
-        else:
-            yield port_name, string(szFriendlyName), szHardwareID_str
+        yield port_num, port_name
 
     SetupDiDestroyDeviceInfoList(g_hdi)

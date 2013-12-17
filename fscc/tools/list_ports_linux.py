@@ -1,7 +1,11 @@
 import glob
 import os
+import re
 
 
 def fsccports():
-    devices = glob.glob('/dev/fscc*')
-    return ((d, os.path.basename(d), 'n/a') for d in devices)
+    device_paths = glob.glob('/dev/fscc*')
+
+    for path in device_paths:
+        port_num = re.search('(\d+)$', path).group(0)
+        yield path, port_num
