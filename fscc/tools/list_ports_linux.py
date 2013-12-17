@@ -8,4 +8,4 @@ def fsccports():
 
     for path in device_paths:
         port_num = re.search('(\d+)$', path).group(0)
-        yield path, port_num
+        yield port_num, path
