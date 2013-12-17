@@ -390,10 +390,6 @@ class Port(object):
 
         return matches.value
 
-    def __parse_output(self, packet):
-        if not packet:
-            return (None, None, None)
-
     @staticmethod
     def __parse_output_windows(append_status, append_timestamp, packet):
         status, timestamp = None, None
