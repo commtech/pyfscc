@@ -1,0 +1,10 @@
+import os
+
+# chose an implementation, depending on os
+if os.name == 'nt': #sys.platform == 'win32':
+    from list_ports_windows import *
+elif os.name == 'posix':
+    from list_ports_posix import *
+
+if __name__ == '__main__':
+    print(list(fsccports()))

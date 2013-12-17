@@ -10,7 +10,7 @@ else:
 
 setup(name='pyfscc',
       version='1.0.0',
-      py_modules=['fscc'],
+      packages = ['fscc', 'fscc.tools'],
       data_files=data_files,
       requires=requirements,
       )
