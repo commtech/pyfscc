@@ -108,7 +108,7 @@ def fsccports():
 
         bytes = array('B', port_num_buffer)
         port_num = struct.unpack('I', bytes)[0]
-        port_name = '\\\\.\\FSCC{}'.format(port_num)
+        port_name = 'FSCC{}'.format(port_num)
 
         yield port_num, port_name
 
