@@ -10,7 +10,7 @@
 
 ## Property
 ```python
-append_timestamp = property(...)
+ignore_timeout = property(...)
 ```
 
 
