@@ -392,7 +392,7 @@ class Port(object):
 
     @staticmethod
     def __parse_output_windows(append_status, append_timestamp, packet):
-        status, timestamp = None, None
+        data, status, timestamp = None, None, None
 
         if (append_status and append_timestamp):
             status = packet[-10:-8]
@@ -412,7 +412,7 @@ class Port(object):
 
     @staticmethod
     def __parse_output_linux(append_status, append_timestamp, packet):
-        status, timestamp = None, None
+        data, status, timestamp = None, None, None
 
         if ctypes.sizeof(ctypes.c_voidp) == 4:
             if (append_status and append_timestamp):
