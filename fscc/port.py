@@ -48,7 +48,8 @@ XF, XREP, TXT, TXEXT = 0, 1, 2, 4
 FSCC_TIMEOUT, FSCC_INCORRECT_MODE, \
     FSCC_BUFFER_TOO_SMALL, \
     FSCC_PORT_NOT_FOUND, \
-    FSCC_INVALID_ACCESS = 16000, 16001, 16002, 16003, 16004
+    FSCC_INVALID_ACCESS, \
+    FSCC_INVALID_PARAMETER = 16000, 16001, 16002, 16003, 16004, 16005
 
 NOT_SUPPORTED_TEXT = 'This feature isn\'t supported on this port.'
 
@@ -77,6 +78,11 @@ class BufferTooSmallError(OSError):
 class IncorrectModeError(OSError):
     def __str__(self):
         return 'Incorrect mode'
+
+
+class InvalidParameterError(ValueError):
+    def __str__(self):
+        return 'Invalid parameter'
 
 
 class Port(object):
@@ -351,7 +357,14 @@ class Port(object):
 
     def _set_clock_frequency(self, frequency):
         """Sets the value of the clock frequency setting."""
-        lib.fscc_set_clock_frequency(self._handle, frequency)
+        e = lib.fscc_set_clock_frequency(self._handle, frequency)
+
+        if e == 0:
+            pass
+        elif e == FSCC_INVALID_PARAMETER:
+            raise InvalidParameterError()
+        else:
+            raise OSError(e)
 
     clock_frequency = property(fset=_set_clock_frequency)
 
