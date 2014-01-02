@@ -31,6 +31,11 @@ clock_frequency = property(...)
 ```
 
 ## Set
+
+| Exception               | Base Exception | Cause
+| ----------------------- | -------------- | ---------------------------------
+| `InvalidParameterError` | `ValueError`    | Clock frequency is out of range (15,000 to 270,000,000)
+
 ###### Examples
 ```python
 import fscc
