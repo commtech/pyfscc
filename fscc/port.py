@@ -263,14 +263,7 @@ class Port(object):
 
         e = lib.fscc_connect(port_num, ctypes.byref(self._handle))
 
-        if e == 0:
-            pass
-        elif e == FSCC_PORT_NOT_FOUND:
-            raise PortNotFoundError(port_num)
-        elif e == FSCC_INVALID_ACCESS:
-            raise InvalidAccessError()
-        else:
-            raise OSError(e)
+        Port._check_error(e)
 
         self._handle = self._handle.value
         self._port_num = port_num
@@ -286,14 +279,7 @@ class Port(object):
 
     def purge(self, tx=True, rx=True):
         """Removes unsent and/or unread data from the card."""
-        e = lib.fscc_purge(self._handle, bool(tx), bool(rx))
-
-        if e == 0:
-            pass
-        elif e == FSCC_TIMEOUT:
-            raise TimeoutError()
-        else:
-            raise OSError(e)
+        self._ctypes_set(lib.fscc_purge, bool(tx), bool(rx))
 
     def _set_append_status(self, status):
         """Sets the value of the append status setting."""
@@ -335,7 +321,7 @@ class Port(object):
 
     def _set_tx_modifiers(self, value):
         """Sets the value of the transmit modifiers setting."""
-        lib.fscc_set_tx_modifiers(self._handle, int(value))
+        self._ctypes_set(lib.fscc_set_tx_modifiers, int(value))
 
     def _get_tx_modifiers(self):
         """Gets the value of the transmit modifiers setting."""
@@ -357,34 +343,51 @@ class Port(object):
 
     def _set_clock_frequency(self, frequency):
         """Sets the value of the clock frequency setting."""
-        e = lib.fscc_set_clock_frequency(self._handle, int(frequency))
+        self._ctypes_set(lib.fscc_set_clock_frequency, int(frequency))
 
+    clock_frequency = property(fset=_set_clock_frequency)
+
+    @staticmethod
+    def _check_error(e):
         if e == 0:
             pass
+        elif e == FSCC_TIMEOUT:
+            raise TimeoutError()
+        elif e == FSCC_INCORRECT_MODE:
+            raise IncorrectModeError()
+        elif e == FSCC_BUFFER_TOO_SMALL:
+            raise BufferTooSmallError()
+        elif e == FSCC_PORT_NOT_FOUND:
+            raise PortNotFoundError()
+        elif e == FSCC_INVALID_ACCESS:
+            raise InvalidAccessError()
         elif e == FSCC_INVALID_PARAMETER:
             raise InvalidParameterError()
         else:
             raise OSError(e)
 
-    clock_frequency = property(fset=_set_clock_frequency)
-
     def _ctypes_set_bool(self, enable_func, disable_func, status):
-        if status:
-            enable_func(self._handle)
-        else:
-            disable_func(self._handle)
+        func = enable_func if status else disable_func
+        e = func(self._handle)
+        Port._check_error(e)
 
     def _ctypes_get_bool(self, func):
-        return True if self._ctypes_get_uint(func) else False
+        return bool(self._ctypes_get_uint(func))
+
+    def _ctypes_set(self, func, *args):
+        e = func(self._handle, *args)
+        Port._check_error(e)
 
     def _ctypes_get_uint(self, func):
         status = ctypes.c_uint()
-        func(self._handle, ctypes.byref(status))
+        e = func(self._handle, ctypes.byref(status))
+        Port._check_error(e)
         return status.value
 
     def _ctypes_get_struct(self, func, fmt, initial):
         buf = struct.pack(fmt, *initial)
-        func(self._handle, buf)
+        e = func(self._handle, buf)
+        Port._check_error(e)
         return struct.unpack(fmt, buf)
 
     def track_interrupts(self, interrupts, timeout=None):
@@ -398,8 +401,7 @@ class Port(object):
             e = lib.fscc_track_interrupts_with_blocking(self._handle, interrupts,
                                             ctypes.byref(matches))
 
-        if e != 0:
-            raise OSError(e)
+        Port._check_error(e)
 
         return matches.value
 
@@ -489,14 +491,7 @@ class Port(object):
             e = lib.fscc_read_with_blocking(self._handle, data, int(size),
                                             ctypes.byref(bytes_read))
 
-        if e == 0:
-            pass
-        elif e == FSCC_BUFFER_TOO_SMALL:
-            raise BufferTooSmallError()
-        elif e == FSCC_INCORRECT_MODE:
-            raise IncorrectModeError()
-        else:
-            raise OSError(e)
+        Port._check_error(e)
 
         return self.__parse_output(data[:bytes_read.value])
 
@@ -505,16 +500,7 @@ class Port(object):
         e = lib.fscc_write_with_blocking(self._handle, data, len(data),
                                          ctypes.byref(bytes_written))
 
-        if e == 0:
-            pass
-        elif e == FSCC_BUFFER_TOO_SMALL:
-            raise BufferTooSmallError()
-        elif e == FSCC_TIMEOUT:
-            raise TimeoutError()
-        elif e == FSCC_INCORRECT_MODE:
-            raise IncorrectModeError()
-        else:
-            raise OSError(e)
+        Port._check_error(e)
 
         return bytes_written.value
 
