@@ -141,7 +141,7 @@ class Port(object):
         def _set_register(self, register, value):
             """Sets the value of a register."""
             self._clear_registers()
-            setattr(self, '_%s' % register, value)
+            setattr(self, '_%s' % register, int(value))
             self._set_registers()
 
         def _clear_registers(self):
@@ -240,7 +240,7 @@ class Port(object):
 
         def _set_imemcap(self, memcap):
             """Sets the value of the input memory cap setting."""
-            self._set_memcap(memcap, -1)
+            self._set_memcap(int(memcap), -1)
 
         def _get_imemcap(self):
             """Gets the value of the output memory cap setting."""
@@ -250,7 +250,7 @@ class Port(object):
 
         def _set_omemcap(self, memcap):
             """Sets the value of the output memory cap setting."""
-            self._set_memcap(-1, memcap)
+            self._set_memcap(-1, int(memcap))
 
         def _get_omemcap(self):
             """Gets the value of the output memory cap setting."""
@@ -286,7 +286,7 @@ class Port(object):
 
     def purge(self, tx=True, rx=True):
         """Removes unsent and/or unread data from the card."""
-        e = lib.fscc_purge(self._handle, tx, rx)
+        e = lib.fscc_purge(self._handle, bool(tx), bool(rx))
 
         if e == 0:
             pass
@@ -335,7 +335,7 @@ class Port(object):
 
     def _set_tx_modifiers(self, value):
         """Sets the value of the transmit modifiers setting."""
-        lib.fscc_set_tx_modifiers(self._handle, value)
+        lib.fscc_set_tx_modifiers(self._handle, int(value))
 
     def _get_tx_modifiers(self):
         """Gets the value of the transmit modifiers setting."""
@@ -357,7 +357,7 @@ class Port(object):
 
     def _set_clock_frequency(self, frequency):
         """Sets the value of the clock frequency setting."""
-        e = lib.fscc_set_clock_frequency(self._handle, frequency)
+        e = lib.fscc_set_clock_frequency(self._handle, int(frequency))
 
         if e == 0:
             pass
@@ -393,7 +393,7 @@ class Port(object):
 
         if timeout:
             e = lib.fscc_track_interrupts_with_timeout(self._handle, interrupts,
-                                           ctypes.byref(matches), timeout)
+                                           ctypes.byref(matches), int(timeout))
         else:
             e = lib.fscc_track_interrupts_with_blocking(self._handle, interrupts,
                                             ctypes.byref(matches))
@@ -480,13 +480,13 @@ class Port(object):
     def read(self, timeout=None, size=4096):
         """Reads data from the card."""
         bytes_read = ctypes.c_uint()
-        data = bytes(size)
+        data = bytes(int(size))
 
         if timeout:
-            e = lib.fscc_read_with_timeout(self._handle, data, size,
-                                           ctypes.byref(bytes_read), timeout)
+            e = lib.fscc_read_with_timeout(self._handle, data, int(size),
+                                           ctypes.byref(bytes_read), int(timeout))
         else:
-            e = lib.fscc_read_with_blocking(self._handle, data, size,
+            e = lib.fscc_read_with_blocking(self._handle, data, int(size),
                                             ctypes.byref(bytes_read))
 
         if e == 0:
