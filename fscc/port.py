@@ -297,9 +297,9 @@ class Port(object):
 
     def _set_append_status(self, status):
         """Sets the value of the append status setting."""
-        return self._ctypes_set_bool(lib.fscc_enable_append_status,
-                                     lib.fscc_disable_append_status,
-                                     status)
+        self._ctypes_set_bool(lib.fscc_enable_append_status,
+                              lib.fscc_disable_append_status,
+                              status)
 
     def _get_append_status(self):
         """Gets the value of the append status setting."""
@@ -309,9 +309,9 @@ class Port(object):
 
     def _set_append_timestamp(self, status):
         """Sets the value of the append timestamp setting."""
-        return self._ctypes_set_bool(lib.fscc_enable_append_timestamp,
-                                     lib.fscc_disable_append_timestamp,
-                                     status)
+        self._ctypes_set_bool(lib.fscc_enable_append_timestamp,
+                              lib.fscc_disable_append_timestamp,
+                              status)
 
     def _get_append_timestamp(self):
         """Gets the value of the append timestamp setting."""
@@ -322,9 +322,9 @@ class Port(object):
 
     def _set_ignore_timeout(self, status):
         """Sets the value of the ignore timeout setting."""
-        return self._ctypes_set_bool(lib.fscc_enable_ignore_timeout,
-                                     lib.fscc_disable_ignore_timeout,
-                                     status)
+        self._ctypes_set_bool(lib.fscc_enable_ignore_timeout,
+                              lib.fscc_disable_ignore_timeout,
+                              status)
 
     def _get_ignore_timeout(self):
         """Gets the value of the ignore timeout setting."""
@@ -345,9 +345,9 @@ class Port(object):
 
     def _set_rx_multiple(self, status):
         """Sets the value of the rx multiple setting."""
-        return self._ctypes_set_bool(lib.fscc_enable_rx_multiple,
-                                     lib.fscc_disable_rx_multiple,
-                                     status)
+        self._ctypes_set_bool(lib.fscc_enable_rx_multiple,
+                              lib.fscc_disable_rx_multiple,
+                              status)
 
     def _get_rx_multiple(self):
         """Gets the value of the ignore timeout setting."""
