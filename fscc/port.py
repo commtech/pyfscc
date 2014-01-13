@@ -106,15 +106,12 @@ class Port(object):
             for register in self.register_names:
                 self._add_register(register)
 
-        def __iter__(self):
-            registers = [-1, -1, self._FIFOT, -1, -1, self._CMDR, self._STAR,
-                         self._CCR0, self._CCR1, self._CCR2, self._BGR,
-                         self._SSR, self._SMR, self._TSR, self._TMR, self._RAR,
-                         self._RAMR, self._PPR, self._TCR, self._VSTR, -1,
-                         self._IMR, self._DPLLR, self._FCR]
-
-            for register in registers:
-                yield register
+        def _internal_registers(self):
+            return [-1, -1, self._FIFOT, -1, -1, self._CMDR, self._STAR,
+                    self._CCR0, self._CCR1, self._CCR2, self._BGR,
+                    self._SSR, self._SMR, self._TSR, self._TMR, self._RAR,
+                    self._RAMR, self._PPR, self._TCR, self._VSTR, -1,
+                    self._IMR, self._DPLLR, self._FCR]
 
         def _add_register(self, register):
             """Dynamically add a way to edit a register to the port."""
@@ -151,7 +148,7 @@ class Port(object):
 
         def _get_registers(self):
             """Gets all of the register values."""
-            registers = list(self)
+            registers = self._internal_registers()
 
             fmt = 'q' * len(registers)
             regs = self.port._ctypes_get_struct(lib.fscc_get_registers, fmt,
@@ -163,7 +160,7 @@ class Port(object):
 
         def _set_registers(self):
             """Sets all of the register values."""
-            registers = list(self)
+            registers = self.internal_registers()
 
             fmt = 'q' * len(registers)
             buf = struct.pack(fmt, *registers)
@@ -213,14 +210,39 @@ class Port(object):
 
         def export_to_file(self, export_file):
             """Writes the current register values to a file."""
-            for register_name in self.editable_register_names:
-                if register_name in self.writeonly_register_names:
+            for reg_name in self.editable_register_names:
+                if reg_name in self.writeonly_register_names:
                     continue
 
-                value = getattr(self, register_name)
+                value = getattr(self, reg_name)
 
                 if value >= 0:
-                    export_file.write('%s = 0x%08x\n' % (register_name, value))
+                    export_file.write('%s = 0x%08x\n' % (reg_name, value))
+
+        def __len__(self):
+            return len(self.register_names)
+
+        def __getitem__(self, key):
+            return self._get_register(key)
+
+        def __setitem__(self, key, value):
+            self._set_register(key, value)
+
+        def __iter__(self):
+            for reg_name in self.register_names:
+                if reg_name not in self.writeonly_register_names:
+                    yield (reg_name, self[reg_name])
+                else:
+                    yield (reg_name, None)
+
+        def __str__(self):
+            reg_values = []
+            for reg_name, reg_value in self:
+                if reg_value is not None:
+                    reg_values.append((reg_name, '0x{:08x}'.format(reg_value)))
+                else:
+                    reg_values.append((reg_name, None))
+            return str(reg_values)
 
     class MemoryCap(object):
 
@@ -530,10 +552,9 @@ if __name__ == '__main__':
     print("Transmit Modifiers", p.tx_modifiers)
     print("RX Multiple", p.rx_multiple)
 
-    print('CCR0', hex(p.registers.CCR0))
-    print('CCR1', hex(p.registers.CCR1))
-    print('CCR2', hex(p.registers.CCR2))
-    print('BGR', hex(p.registers.BGR))
+    for reg_name, reg_value in p.registers:
+        if reg_value is not None:
+            print(reg_name, hex(reg_value))
 
     p.append_status = True
     p.append_timestamp = True
