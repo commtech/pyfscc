@@ -1,11 +1,11 @@
 # TX Modifiers
 
-It is a good idea to pay attention to the status of each frame. For example,
-you may want to see if the frame's CRC check succeeded or failed.
-
-The FSCC reports this data to you by appending two additional bytes to each
-frame you read from the card, if you opt-in to see this data. There are a few
-methods of enabling this additional data.
+| Modifiers | Value | Description
+| -------- | ------ | -----------
+| `XF`     | `0`    | Normal transmit (disable modifiers)
+| `XREP`   | `1`    | Transmit frame repeatedly
+| `TXT`    | `2`    | Transmit frame on timer
+| `TXEXT`  | `4`    | Transmit frame on external signal
 
 ###### Support
 | Code           | Version
