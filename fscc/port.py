@@ -55,9 +55,13 @@ NOT_SUPPORTED_TEXT = 'This feature isn\'t supported on this port.'
 
 
 class PortNotFoundError(OSError):
-    def __init__(self, port_num):
-        super(PortNotFoundError, self).__init__(
-            'Port {} not found'.format(port_num))
+    def __init__(self, port_num=None):
+        if port_num:
+            error_msg = 'Port {} not found'.format(port_num)
+        else:
+            error_msg = 'Port not found'
+
+        super(PortNotFoundError, self).__init__(error_msg)
 
 
 class InvalidAccessError(OSError):
