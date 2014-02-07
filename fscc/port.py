@@ -164,7 +164,7 @@ class Port(object):
 
         def _set_registers(self):
             """Sets all of the register values."""
-            registers = self.internal_registers()
+            registers = self._internal_registers()
 
             fmt = 'q' * len(registers)
             buf = struct.pack(fmt, *registers)
