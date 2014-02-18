@@ -68,8 +68,7 @@ own program. All of these options are described on their respective documentatio
 
 
 ## Dependencies
-- Python 3
-- pywin32 (for Windows)
+- Python 3 (32-bit)
 
 
 ## API Compatibility
