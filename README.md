@@ -67,7 +67,7 @@ own program. All of these options are described on their respective documentatio
 - [Read](https://github.com/commtech/pyfscc/blob/master/docs/read.md)
 
 
-## Dependencies
+## Build Dependencies
 - [Python 3](http://www.python.org/download/) (32-bit)
 - [cfscc](https://github.com/commtech/cfscc/) (Included)
 
