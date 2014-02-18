@@ -69,6 +69,7 @@ own program. All of these options are described on their respective documentatio
 
 ## Dependencies
 - [Python 3](http://www.python.org/download/) (32-bit)
+- [cfscc](https://github.com/commtech/cfscc/) (Included)
 
 
 ## API Compatibility
