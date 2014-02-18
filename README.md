@@ -68,7 +68,7 @@ own program. All of these options are described on their respective documentatio
 
 
 ## Dependencies
-- Python 3 (32-bit)
+- [Python 3](http://www.python.org/download/) (32-bit)
 
 
 ## API Compatibility
