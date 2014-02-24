@@ -419,11 +419,11 @@ class Port(object):
         matches = ctypes.c_uint()
 
         if timeout:
-            e = lib.fscc_track_interrupts_with_timeout(self._handle, interrupts,
-                                           ctypes.byref(matches), int(timeout))
+            e = lib.fscc_track_interrupts_with_timeout(
+                self._handle, interrupts, ctypes.byref(matches), int(timeout))
         else:
-            e = lib.fscc_track_interrupts_with_blocking(self._handle, interrupts,
-                                            ctypes.byref(matches))
+            e = lib.fscc_track_interrupts_with_blocking(
+                self._handle, interrupts, ctypes.byref(matches))
 
         Port._check_error(e)
 
@@ -510,7 +510,8 @@ class Port(object):
 
         if timeout:
             e = lib.fscc_read_with_timeout(self._handle, data, int(size),
-                                           ctypes.byref(bytes_read), int(timeout))
+                                           ctypes.byref(bytes_read),
+                                           int(timeout))
         else:
             e = lib.fscc_read_with_blocking(self._handle, data, int(size),
                                             ctypes.byref(bytes_read))
