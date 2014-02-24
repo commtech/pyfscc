@@ -51,8 +51,6 @@ FSCC_TIMEOUT, FSCC_INCORRECT_MODE, \
     FSCC_INVALID_ACCESS, \
     FSCC_INVALID_PARAMETER = 16000, 16001, 16002, 16003, 16004, 16005
 
-NOT_SUPPORTED_TEXT = 'This feature isn\'t supported on this port.'
-
 
 class PortNotFoundError(OSError):
     def __init__(self, port_num=None):
