@@ -51,8 +51,6 @@ FSCC_TIMEOUT, FSCC_INCORRECT_MODE, \
     FSCC_INVALID_ACCESS, \
     FSCC_INVALID_PARAMETER = 16000, 16001, 16002, 16003, 16004, 16005
 
-NOT_SUPPORTED_TEXT = 'This feature isn\'t supported on this port.'
-
 
 class PortNotFoundError(OSError):
     def __init__(self, port_num=None):
@@ -421,11 +419,11 @@ class Port(object):
         matches = ctypes.c_uint()
 
         if timeout:
-            e = lib.fscc_track_interrupts_with_timeout(self._handle, interrupts,
-                                           ctypes.byref(matches), int(timeout))
+            e = lib.fscc_track_interrupts_with_timeout(
+                self._handle, interrupts, ctypes.byref(matches), int(timeout))
         else:
-            e = lib.fscc_track_interrupts_with_blocking(self._handle, interrupts,
-                                            ctypes.byref(matches))
+            e = lib.fscc_track_interrupts_with_blocking(
+                self._handle, interrupts, ctypes.byref(matches))
 
         Port._check_error(e)
 
@@ -512,7 +510,8 @@ class Port(object):
 
         if timeout:
             e = lib.fscc_read_with_timeout(self._handle, data, int(size),
-                                           ctypes.byref(bytes_read), int(timeout))
+                                           ctypes.byref(bytes_read),
+                                           int(timeout))
         else:
             e = lib.fscc_read_with_blocking(self._handle, data, int(size),
                                             ctypes.byref(bytes_read))
