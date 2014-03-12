@@ -5,13 +5,11 @@ This README file is best viewed [online](http://github.com/commtech/pyfscc/).
 
 ##### Downloading Library
 - You can use the pre-built library files that are included with the driver
-- Or, you can download the latest library version from
-[Github releases](https://github.com/commtech/pyfscc/releases).
+- Or, you can download the latest library version from [Github releases](https://github.com/commtech/pyfscc/releases).
 
 
 ##### Installing Driver
-If you are not using the included Windows installer, you can install the library
-by using the setup script.
+If you are not using the included Windows installer, you can install the library by using the setup script.
 
 ```
 python setup.py install
@@ -22,8 +20,7 @@ python setup.py install
 
 Lets get started with a quick programming example for fun.
 
-_This tutorial has already been set up for you at_ 
-[`examples/tutorial.py`](https://github.com/commtech/pyfscc/tree/master/examples/tutorial.py).
+_This tutorial has already been set up for you at_ [`examples/tutorial.py`](examples/tutorial.py).
 
 First, create a new Python file (named tutorial.py) with the following code.
 
@@ -44,27 +41,26 @@ Now attach the included loopback connector.
 b'Hello world!'
 ```
 
-You have now transmitted and received an HDLC frame! 
+You have now transmitted and received an HDLC frame!
 
 
 ## API Reference
 
-There are likely other configuration options you will need to set up for your 
-own program. All of these options are described on their respective documentation page.
+There are likely other configuration options you will need to set up for your own program. All of these options are described on their respective documentation page.
 
-- [Connect](https://github.com/commtech/pyfscc/blob/master/docs/connect.md)
-- [Append Status](https://github.com/commtech/pyfscc/blob/master/docs/append-status.md)
-- [Append Timestamp](https://github.com/commtech/pyfscc/blob/master/docs/append-timestamp.md)
-- [Clock Frequency](https://github.com/commtech/pyfscc/blob/master/docs/clock-frequency.md)
-- [Ignore Timeout](https://github.com/commtech/pyfscc/blob/master/docs/ignore-timeout.md)
-- [RX Multiple](https://github.com/commtech/pyfscc/blob/master/docs/rx-multiple.md)
-- [Memory Cap](https://github.com/commtech/pyfscc/blob/master/docs/memory-cap.md)
-- [Purge](https://github.com/commtech/pyfscc/blob/master/docs/purge.md)
-- [Registers](https://github.com/commtech/pyfscc/blob/master/docs/registers.md)
-- [TX Modifiers](https://github.com/commtech/pyfscc/blob/master/docs/tx-modifiers.md)
-- [Track Interrupts](https://github.com/commtech/pyfscc/blob/master/docs/track-interrupts.md)
-- [Writes](https://github.com/commtech/pyfscc/blob/master/docs/write.md)
-- [Read](https://github.com/commtech/pyfscc/blob/master/docs/read.md)
+- [Connect](docs/connect.md)
+- [Append Status](docs/append-status.md)
+- [Append Timestamp](docs/append-timestamp.md)
+- [Clock Frequency](docs/clock-frequency.md)
+- [Ignore Timeout](docs/ignore-timeout.md)
+- [Memory Cap](docs/memory-cap.md)
+- [Purge](docs/purge.md)
+- [Read](docs/read.md)
+- [Registers](docs/registers.md)
+- [RX Multiple](docs/rx-multiple.md)
+- [Track Interrupts](docs/track-interrupts.md)
+- [TX Modifiers](docs/tx-modifiers.md)
+- [Writes](docs/write.md)
 
 
 ## Run-time Dependencies
