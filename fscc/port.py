@@ -187,40 +187,6 @@ class Port(object):
                 if i == index:
                     setattr(self, '_%s' % r, value)
 
-        # Note: clears registers
-        def import_from_file(self, import_file):
-            """Reads and stores the register values from a file."""
-            import_file.seek(0, os.SEEK_SET)
-
-            for line in import_file:
-                try:
-                    line = str(line, encoding='utf8')
-                except:
-                    pass
-
-                if line[0] != '#':
-                    d = line.split('=')
-                    reg_name, reg_val = d[0].strip().upper(), d[1].strip()
-
-                    if reg_name in self.editable_register_names:
-                        if reg_val[0] == '0' and reg_val[1] in ['x', 'X']:
-                            reg_val = int(reg_val, 16)
-                        else:
-                            reg_val = int(reg_val)
-
-                        setattr(self, reg_name, reg_val)
-
-        def export_to_file(self, export_file):
-            """Writes the current register values to a file."""
-            for reg_name in self.editable_register_names:
-                if reg_name in self.writeonly_register_names:
-                    continue
-
-                value = getattr(self, reg_name)
-
-                if value >= 0:
-                    export_file.write('%s = 0x%08x\n' % (reg_name, value))
-
         def __len__(self):
             return len(self.register_names)
 
