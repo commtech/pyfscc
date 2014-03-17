@@ -22,6 +22,7 @@ import struct
 import os
 import ctypes
 import sys
+import json
 
 if os.name == 'nt':
     DLL_NAME = 'cfscc.dll'
@@ -212,6 +213,22 @@ class Port(object):
                     reg_values.append((reg_name, None))
             return str(reg_values)
 
+        def to_json(self):
+            ol = {}
+
+            for reg_name, reg_value in self:
+                if reg_value is not None:
+                    ol[reg_name] = hex(reg_value)
+
+            return ol
+
+        def from_json(self, json):
+            for name, value in json.items():
+                try:
+                    setattr(self, name, int(value, 0))
+                except AttributeError:
+                    pass
+
     class MemoryCap(object):
 
         def __init__(self, port=None):
@@ -247,6 +264,16 @@ class Port(object):
             return self._get_memcap()[1]
 
         output = property(fset=_set_omemcap, fget=_get_omemcap)
+
+        def to_json(self):
+            return {
+                'input': self.input,
+                'output': self.output,
+            }
+
+        def from_json(self, json):
+            self.input = json['input']
+            self.output = json['output']
 
     def __init__(self, port_num, append_status=True, append_timestamp=True):
         self._handle = ctypes.c_void_p()
@@ -497,6 +524,26 @@ class Port(object):
 
     def close(self):
         lib.fscc_disconnect(self._handle)
+
+    def to_json(self):
+        return {
+            'append_status': self.append_status,
+            'append_timestamp': self.append_timestamp,
+            'ignore_timeout': self.ignore_timeout,
+            'tx_modifiers': self.tx_modifiers,
+            'rx_multiple': self.rx_multiple,
+            'registers': self.registers.to_json(),
+            'memory_cap': self.memory_cap.to_json(),
+        }
+
+    def from_json(self, json):
+        self.append_status = json['append_status']
+        self.append_timestamp = json['append_timestamp']
+        self.ignore_timeout = json['ignore_timeout']
+        self.tx_modifiers = json['tx_modifiers']
+        self.rx_multiple = json['rx_multiple']
+        self.registers.from_json(json['registers'])
+        self.memory_cap.from_json(json['memory_cap'])
 
     def __str__(self):
         if os.name == 'nt':
