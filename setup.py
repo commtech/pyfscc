@@ -2,10 +2,10 @@ import os
 from distutils.core import setup
 
 if os.name == 'nt':
-    requirements = ['serial', 'win32']
+    requirements = ['win32']
     data_files=[('DLLs', ['cfscc.dll'])]
 else:
-    requirements = ['serial']
+    requirements = []
     data_files=[('DLLs', ['libcfscc.so', 'libcfscc.so.6'])]
 
 setup(name='pyfscc',
