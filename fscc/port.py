@@ -213,7 +213,7 @@ class Port(object):
                     reg_values.append((reg_name, None))
             return str(reg_values)
 
-        def to_json(self):
+        def _to_json(self):
             ol = {}
 
             for reg_name, reg_value in self:
@@ -221,6 +221,9 @@ class Port(object):
                     ol[reg_name] = hex(reg_value)
 
             return ol
+
+        def to_json(self, *args, **kwargs):
+            return json.dumps(self._to_json(), *args, **kwargs)
 
         def from_json(self, json):
             for name, value in json.items():
@@ -265,11 +268,14 @@ class Port(object):
 
         output = property(fset=_set_omemcap, fget=_get_omemcap)
 
-        def to_json(self):
+        def _to_json(self):
             return {
                 'input': self.input,
                 'output': self.output,
             }
+
+        def to_json(self, *args, **kwargs):
+            return json.dumps(self._to_json(), *args, **kwargs)
 
         def from_json(self, json):
             self.input = json['input']
@@ -525,16 +531,19 @@ class Port(object):
     def close(self):
         lib.fscc_disconnect(self._handle)
 
-    def to_json(self):
+    def _to_json(self):
         return {
             'append_status': self.append_status,
             'append_timestamp': self.append_timestamp,
             'ignore_timeout': self.ignore_timeout,
             'tx_modifiers': self.tx_modifiers,
             'rx_multiple': self.rx_multiple,
-            'registers': self.registers.to_json(),
-            'memory_cap': self.memory_cap.to_json(),
+            'registers': self.registers._to_json(),
+            'memory_cap': self.memory_cap._to_json(),
         }
+
+    def to_json(self, *args, **kwargs):
+        return json.dumps(self._to_json(), *args, **kwargs)
 
     def from_json(self, json):
         self.append_status = json['append_status']
